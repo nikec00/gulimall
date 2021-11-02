@@ -1,0 +1,14 @@
+server:
+  port: 8000
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.60.175:3306/gulimall_ums?characterEncoding=utf-8&allowMultiQueries=true&serverTimezone=UTC
+    username: root
+    password: root
+mybatis-plus:
+  type-aliases-package: com.atguigu.gulimall.member.entity
+  mapper-locations: classpath:/mapper/member/*Dao.xml
+  global-config:
+    db-config:
+      id-type: auto
