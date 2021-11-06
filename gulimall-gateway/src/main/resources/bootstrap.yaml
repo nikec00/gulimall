@@ -1,15 +1,16 @@
 server:
   port: 88
 spring:
-  profiles:
-    active: dev
   application:
     name: gulimall-gateway
+  profiles:
+    active: dev
   cloud:
     nacos:
       discovery:
+        namespace: e545c141-f794-4b40-ad0e-bebff183e997
         server-addr: localhost:8848
-        namespace: e545c141-f794-4b40-ad0e-bebff183e997
       config:
-        file-extension: yaml
         namespace: e545c141-f794-4b40-ad0e-bebff183e997
+        server-addr: localhost:8848
+        file-extension: yaml

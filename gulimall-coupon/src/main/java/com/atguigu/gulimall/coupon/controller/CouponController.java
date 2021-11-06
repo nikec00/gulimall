@@ -40,12 +40,12 @@ public class CouponController {
         return R.ok().put("name",name).put("age",age);
     }
 
-    @GetMapping("member/list")
-    public R memberCoupons() {
-        CouponEntity couponEntity = new CouponEntity();
-        couponEntity.setCouponName("满一百减十");
-        return R.ok().put("coupons", Arrays.asList(couponEntity));
-    }
+//    @GetMapping("member/list")
+//    public R memberCoupons() {
+//        CouponEntity couponEntity = new CouponEntity();
+//        couponEntity.setCouponName("满一百减十");
+//        return R.ok().put("coupons", Arrays.asList(couponEntity));
+//    }
 
     /**
      * 列表
