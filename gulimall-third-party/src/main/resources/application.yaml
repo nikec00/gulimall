@@ -3,10 +3,10 @@ server:
 spring:
   cloud:
     alicloud:
-      access-key: LTAI5tD97hQ4xEnpRkW11wpS
-      secret-key: JivLb0ncSwYIMTAK0ZyXRPbfzV37vD
+      access-key:
+      secret-key:
       oss:
-        endpoint: oss-cn-hangzhou.aliyuncs.com
+        endpoint:
     nacos:
       discovery:
         server-addr: localhost:8848
