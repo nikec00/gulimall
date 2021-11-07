@@ -12,9 +12,19 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    alicloud:
+      access-key: LTAI5tD97hQ4xEnpRkW11wpS
+      secret-key: JivLb0ncSwYIMTAK0ZyXRPbfzV37vD
+      oss:
+        endpoint: oss-cn-hangzhou.aliyuncs.com
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml
   global-config:
     db-config:
       id-type: auto
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+logging:
+  level:
+    com.atguigu.gulimall: debug
