@@ -10,12 +10,6 @@ server:
     context-path: /renren-fast
 
 spring:
-  application:
-    name: renren-fast
-  cloud:
-    nacos:
-      discovery:
-        server-addr: localhost:8848
   # 环境 dev|test|prod
   profiles:
     active: dev
@@ -28,6 +22,16 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
+  application:
+    name: renren-fast
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        namespace: 87448ee3-7074-4b4d-bc8c-50d34e7acf88
+        server-addr: localhost:8848
+
   redis:
     open: false  # 是否开启redis缓存  true开启   false关闭
     database: 0
@@ -49,7 +53,7 @@ spring:
 
 #mybatis
 mybatis-plus:
-  mapper-locations: classpath*:/mapper/**/*.xml
+  mapper-locations: classpath:/mapper/**/*.xml
   #实体扫描，多个package用逗号或者分号分隔
   typeAliasesPackage: io.renren.modules.*.entity
   global-config:

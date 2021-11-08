@@ -19,7 +19,6 @@ import io.renren.common.validator.group.AliyunGroup;
 import io.renren.common.validator.group.QcloudGroup;
 import io.renren.common.validator.group.QiniuGroup;
 import io.renren.modules.oss.cloud.CloudStorageConfig;
-import io.renren.modules.oss.cloud.OSSFactory;
 import io.renren.modules.oss.entity.SysOssEntity;
 import io.renren.modules.oss.service.SysOssService;
 import io.renren.modules.sys.service.SysConfigService;
@@ -44,7 +43,6 @@ public class SysOssController {
 	private SysOssService sysOssService;
     @Autowired
     private SysConfigService sysConfigService;
-
     private final static String KEY = ConfigConstant.CLOUD_STORAGE_CONFIG_KEY;
 	
 	/**
@@ -109,7 +107,8 @@ public class SysOssController {
 
 		//上传文件
 		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
-		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);
+//		String url = OSSFactory.build().uploadSuffix(file.getBytes(), suffix);
+		String url = null;
 
 		//保存文件信息
 		SysOssEntity ossEntity = new SysOssEntity();

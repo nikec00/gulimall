@@ -57,4 +57,75 @@ public class AttrEntity implements Serializable {
 	 */
 	private Integer showDesc;
 
+	public Long getAttrId() {
+		return attrId;
+	}
+
+	public void setAttrId(Long attrId) {
+		this.attrId = attrId;
+	}
+
+	public String getAttrName() {
+		return attrName;
+	}
+
+	public void setAttrName(String attrName) {
+		this.attrName = attrName;
+	}
+
+	public Integer getSearchType() {
+		return searchType;
+	}
+
+	public void setSearchType(Integer searchType) {
+		this.searchType = searchType;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public String getValueSelect() {
+		return valueSelect;
+	}
+
+	public void setValueSelect(String valueSelect) {
+		this.valueSelect = valueSelect;
+	}
+
+	public Integer getAttrType() {
+		return attrType;
+	}
+
+	public void setAttrType(Integer attrType) {
+		this.attrType = attrType;
+	}
+
+	public Long getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Long enable) {
+		this.enable = enable;
+	}
+
+	public Long getCatelogId() {
+		return catelogId;
+	}
+
+	public void setCatelogId(Long catelogId) {
+		this.catelogId = catelogId;
+	}
+
+	public Integer getShowDesc() {
+		return showDesc;
+	}
+
+	public void setShowDesc(Integer showDesc) {
+		this.showDesc = showDesc;
+	}
 }

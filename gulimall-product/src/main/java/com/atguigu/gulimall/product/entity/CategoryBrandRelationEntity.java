@@ -41,4 +41,43 @@ public class CategoryBrandRelationEntity implements Serializable {
 	 */
 	private String catelogName;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getBrandId() {
+		return brandId;
+	}
+
+	public void setBrandId(Long brandId) {
+		this.brandId = brandId;
+	}
+
+	public Long getCatelogId() {
+		return catelogId;
+	}
+
+	public void setCatelogId(Long catelogId) {
+		this.catelogId = catelogId;
+	}
+
+	public String getBrandName() {
+		return brandName;
+	}
+
+	public void setBrandName(String brandName) {
+		this.brandName = brandName;
+	}
+
+	public String getCatelogName() {
+		return catelogName;
+	}
+
+	public void setCatelogName(String catelogName) {
+		this.catelogName = catelogName;
+	}
 }

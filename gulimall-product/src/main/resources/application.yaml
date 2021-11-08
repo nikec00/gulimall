@@ -5,18 +5,13 @@ spring:
     name: gulimall-product
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.60.176:3306/gulimall_pms?characterEncoding=utf-8&allowMultiQueries=true&serverTimezone=UTC
+    url: jdbc:mysql://121.40.210.58:3306/gulimall_pms?characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
     username: root
     password: root
   cloud:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
-    alicloud:
-      access-key: LTAI5tD97hQ4xEnpRkW11wpS
-      secret-key: JivLb0ncSwYIMTAK0ZyXRPbfzV37vD
-      oss:
-        endpoint: oss-cn-hangzhou.aliyuncs.com
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml
