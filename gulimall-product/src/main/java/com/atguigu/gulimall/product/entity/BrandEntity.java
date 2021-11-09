@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.product.entity;
 
+import com.atguigu.common.valid.AddGroup;
+import com.atguigu.common.valid.UpdateGroup;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
@@ -26,17 +28,19 @@ public class BrandEntity implements Serializable {
 	 * 品牌idN
 	 */
 	@TableId
+	@NotNull(message = "修改时必须指定品牌id",groups = {UpdateGroup.class})
+	@Null(message = "新增时不能指定品牌id",groups = {AddGroup.class})
 	private Long brandId;
 	/**
 	 * 品牌名
 	 */
-	@NotBlank(message = "品牌名必须提交")
+	@NotBlank(message = "品牌名必须提交",groups = {UpdateGroup.class,AddGroup.class})
 	private String name;
 	/**
 	 * 品牌logo地址
 	 */
-	@NotEmpty
-	@URL(message = "logo必须是一个合法的URL地址")
+	@NotEmpty(message = "品牌logo不能为空",groups = {AddGroup.class})
+	@URL(message = "logo必须是一个合法的URL地址",groups = {UpdateGroup.class,AddGroup.class})
 	private String logo;
 	/**
 	 * 介绍
@@ -49,7 +53,7 @@ public class BrandEntity implements Serializable {
 	/**
 	 * 检索首字母
 	 */
-	@NotEmpty
+	@NotEmpty(groups = {AddGroup.class})
 	@Pattern(regexp = "/~[a-zA-Z]$/",message = "检索首字母必须是一个字母")
 	private String firstLetter;
 	/**
