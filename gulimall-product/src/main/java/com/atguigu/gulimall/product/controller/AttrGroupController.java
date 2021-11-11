@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,9 +65,8 @@ public class AttrGroupController {
      */
     @RequestMapping("/save")
     // @RequiresPermissions("product:attrgroup:save")
-    public R save(@RequestBody AttrGroupEntity attrGroup) {
-        attrGroupService.save(attrGroup);
-
+    public R save(@RequestBody AttrGroupEntity attrGroupEntity) {
+        attrGroupService.save(attrGroupEntity);
         return R.ok();
     }
 

@@ -9,6 +9,6 @@ spring:
         endpoint: oss-cn-hangzhou.aliyuncs.com
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: 121.40.210.58:8848
   application:
     name: gulimall-third-party

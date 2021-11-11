@@ -27,10 +27,10 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848
+        server-addr: 121.40.210.58:8848
       config:
         namespace: 87448ee3-7074-4b4d-bc8c-50d34e7acf88
-        server-addr: localhost:8848
+        server-addr: 121.40.210.58:8848
 
   redis:
     open: false  # 是否开启redis缓存  true开启   false关闭

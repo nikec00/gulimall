@@ -5,6 +5,7 @@ import com.atguigu.gulimall.product.dao.CategoryDao;
 import com.atguigu.gulimall.product.entity.BrandEntity;
 import com.atguigu.gulimall.product.entity.CategoryEntity;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +46,6 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
 
 
     }
-
     @Override
     public void updateBrand(Long brandId, String name) {
         CategoryBrandRelationEntity relationEntity = new CategoryBrandRelationEntity();

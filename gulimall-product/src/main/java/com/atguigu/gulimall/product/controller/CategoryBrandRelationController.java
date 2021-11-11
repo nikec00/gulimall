@@ -55,7 +55,7 @@ public class CategoryBrandRelationController {
      * 信息
      */
     @RequestMapping("/info/{id}")
-    // @RequiresPermissions("product:categorybrandrelation:info")
+    // @RequiresPermissions("product:categorybrandrelation:info")e
     public R info(@PathVariable("id") Long id) {
         CategoryBrandRelationEntity categoryBrandRelation = categoryBrandRelationService.getById(id);
 
