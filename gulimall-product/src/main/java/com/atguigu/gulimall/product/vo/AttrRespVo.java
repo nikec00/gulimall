@@ -10,6 +10,7 @@ public class AttrRespVo extends AttrVO {
 
     private String catelogName;
     private String groupName;
+    private Long[] catelogPath;
 
     public String getCatelogName() {
         return catelogName;
@@ -27,4 +28,11 @@ public class AttrRespVo extends AttrVO {
         this.groupName = groupName;
     }
 
+    public Long[] getCatelogPath() {
+        return catelogPath;
+    }
+
+    public void setCatelogPath(Long[] catelogPath) {
+        this.catelogPath = catelogPath;
+    }
 }
