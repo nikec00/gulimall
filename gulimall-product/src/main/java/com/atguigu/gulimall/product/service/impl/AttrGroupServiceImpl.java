@@ -1,8 +1,5 @@
 package com.atguigu.gulimall.product.service.impl;
 
-import com.atguigu.gulimall.product.entity.AttrEntity;
-import com.atguigu.gulimall.product.vo.AttrVO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

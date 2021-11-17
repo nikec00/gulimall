@@ -4,13 +4,11 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
-import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrRespVo;
-import com.atguigu.gulimall.product.vo.AttrVO;
+import com.atguigu.gulimall.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
@@ -68,7 +66,7 @@ public class AttrController {
      */
     @RequestMapping("/save")
     // @RequiresPermissions("product:attr:save")
-    public R save(@RequestBody AttrVO attrVO) {
+    public R save(@RequestBody AttrVo attrVO) {
         attrService.saveAttr(attrVO);
 
         return R.ok();
@@ -79,7 +77,7 @@ public class AttrController {
      */
     @RequestMapping("/update")
     // @RequiresPermissions("product:attr:update")
-    public R update(@RequestBody AttrVO attr) {
+    public R update(@RequestBody AttrVo attr) {
         attrService.updateAttr(attr);
 
         return R.ok();

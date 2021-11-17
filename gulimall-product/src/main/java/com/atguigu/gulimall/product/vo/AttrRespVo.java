@@ -6,7 +6,7 @@ package com.atguigu.gulimall.product.vo;
  * @Author: nkc
  * @Date: 2021/11/11 21:34
  */
-public class AttrRespVo extends AttrVO {
+public class AttrRespVo extends AttrVo {
 
     private String catelogName;
     private String groupName;

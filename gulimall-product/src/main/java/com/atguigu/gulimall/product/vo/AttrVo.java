@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @Author: nkc
  * @Date: 2021/11/11 21:11
  */
-public class AttrVO implements Serializable {
+public class AttrVo implements Serializable {
 
     /**
      * 属性id
