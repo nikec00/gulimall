@@ -3,6 +3,7 @@
  */
 package com.atguigu.gulimall.product.vo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -15,16 +16,16 @@ public class Skus {
 
     private List<Attr> attr;
     private String skuName;
-    private String price;
+    private BigDecimal price;
     private String skuTitle;
     private String skuSubtitle;
     private List<Images> images;
     private List<String> descar;
     private int fullCount;
-    private int discount;
+    private BigDecimal discount;
     private int countStatus;
-    private int fullPrice;
-    private int reducePrice;
+    private BigDecimal fullPrice;
+    private BigDecimal reducePrice;
     private int priceStatus;
     private List<MemberPrice> memberPrice;
 
@@ -44,11 +45,11 @@ public class Skus {
         return skuName;
     }
 
-    public void setPrice(String price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
-    public String getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
@@ -92,11 +93,11 @@ public class Skus {
         return fullCount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
 
-    public int getDiscount() {
+    public BigDecimal getDiscount() {
         return discount;
     }
 
@@ -108,19 +109,19 @@ public class Skus {
         return countStatus;
     }
 
-    public void setFullPrice(int fullPrice) {
+    public void setFullPrice(BigDecimal fullPrice) {
         this.fullPrice = fullPrice;
     }
 
-    public int getFullPrice() {
+    public BigDecimal getFullPrice() {
         return fullPrice;
     }
 
-    public void setReducePrice(int reducePrice) {
+    public void setReducePrice(BigDecimal reducePrice) {
         this.reducePrice = reducePrice;
     }
 
-    public int getReducePrice() {
+    public BigDecimal getReducePrice() {
         return reducePrice;
     }
 

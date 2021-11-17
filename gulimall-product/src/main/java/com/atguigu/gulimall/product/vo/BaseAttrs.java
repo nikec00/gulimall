@@ -11,15 +11,15 @@ package com.atguigu.gulimall.product.vo;
  */
 public class BaseAttrs {
 
-    private int attrId;
+    private Long attrId;
     private String attrValues;
     private int showDesc;
 
-    public void setAttrId(int attrId) {
+    public void setAttrId(Long attrId) {
         this.attrId = attrId;
     }
 
-    public int getAttrId() {
+    public Long getAttrId() {
         return attrId;
     }
 

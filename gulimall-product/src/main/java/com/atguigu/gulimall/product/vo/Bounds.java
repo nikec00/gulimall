@@ -3,6 +3,8 @@
  */
 package com.atguigu.gulimall.product.vo;
 
+import java.math.BigDecimal;
+
 /**
  * Auto-generated: 2021-11-17 17:21:56
  *
@@ -11,14 +13,14 @@ package com.atguigu.gulimall.product.vo;
  */
 public class Bounds {
 
-    private int buyBounds;
+    private BigDecimal buyBounds;
     private int growBounds;
 
-    public void setBuyBounds(int buyBounds) {
+    public void setBuyBounds(BigDecimal buyBounds) {
         this.buyBounds = buyBounds;
     }
 
-    public int getBuyBounds() {
+    public BigDecimal getBuyBounds() {
         return buyBounds;
     }
 

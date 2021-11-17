@@ -60,7 +60,7 @@ public class SpuInfoController {
     @RequestMapping("/save" )
     // @RequiresPermissions("product:spuinfo:save")
     public R save(@RequestBody SpuSaveVo spuSaveVo) {
-//            spuInfoService.save(spuSaveVo);
+        spuInfoService.saveSpuInfo(spuSaveVo);
         return R.ok();
     }
 

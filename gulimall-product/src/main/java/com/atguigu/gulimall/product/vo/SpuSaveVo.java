@@ -3,6 +3,7 @@
  */
 package com.atguigu.gulimall.product.vo;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -15,9 +16,9 @@ public class SpuSaveVo {
 
     private String spuName;
     private String spuDescription;
-    private int catalogId;
-    private int brandId;
-    private double weight;
+    private Long catalogId;
+    private Long brandId;
+    private BigDecimal weight;
     private int publishStatus;
     private List<String> decript;
     private List<String> images;
@@ -41,27 +42,27 @@ public class SpuSaveVo {
         return spuDescription;
     }
 
-    public void setCatalogId(int catalogId) {
+    public void setCatalogId(Long catalogId) {
         this.catalogId = catalogId;
     }
 
-    public int getCatalogId() {
+    public Long getCatalogId() {
         return catalogId;
     }
 
-    public void setBrandId(int brandId) {
+    public void setBrandId(Long brandId) {
         this.brandId = brandId;
     }
 
-    public int getBrandId() {
+    public Long getBrandId() {
         return brandId;
     }
 
-    public void setWeight(double weight) {
+    public void setWeight(BigDecimal weight) {
         this.weight = weight;
     }
 
-    public double getWeight() {
+    public BigDecimal getWeight() {
         return weight;
     }
 
