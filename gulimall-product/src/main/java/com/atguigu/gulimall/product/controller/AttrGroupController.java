@@ -8,6 +8,7 @@ import java.util.Map;
 import com.atguigu.gulimall.product.entity.AttrEntity;
 import com.atguigu.gulimall.product.service.AttrService;
 import com.atguigu.gulimall.product.service.CategoryService;
+import com.atguigu.gulimall.product.vo.AttrGroupRelationVo;
 import com.atguigu.gulimall.product.vo.AttrVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +67,13 @@ public class AttrGroupController {
         Long[] path = categoryService.findCatelogPath(catelogId);
         attrGroup.setCatelogPath(path);
         return R.ok().put("attrGroup", attrGroup);
+    }
+
+    ///product/attrgroup/attr/relation/delete
+    @PostMapping("/attr/relation/delete")
+    public R deleteRelation(AttrGroupRelationVo[] vos) {
+        attrService.deleteRelation(vos);
+        return R.ok();
     }
 
     /**

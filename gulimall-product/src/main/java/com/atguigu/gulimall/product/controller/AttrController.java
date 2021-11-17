@@ -49,12 +49,7 @@ public class AttrController {
         return R.ok().put("page", pages);
     }
 
-    ///product/attrgroup/attr/relation/delete
-    @PostMapping("/attr/relation/delete")
-    public R deleteRelation(AttrGroupRelationVo[] vos) {
-        attrService.deleteRelation(vos);
-        return R.ok();
-    }
+
 
     /**
      * 信息
