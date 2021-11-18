@@ -5,16 +5,23 @@ spring:
     name: gulimall-ware
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.60.176:3306/gulimall_wms?characterEncoding=utf-8&allowMultiQueries=true&serverTimezone=UTC
+    url: jdbc:mysql://121.40.210.58:3306/gulimall_wms?characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=UTC
     username: root
     password: root
   cloud:
     nacos:
       discovery:
-        server-addr: 127.0.0.1:8848
+        server-addr: 121.40.210.58:8848
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.ware.entity
   mapper-locations: classpath:/mapper/ware/*Dao.xml
   global-config:
     db-config:
       id-type: auto
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+logging:
+  level:
+    com.atguigu.gulimall: debug

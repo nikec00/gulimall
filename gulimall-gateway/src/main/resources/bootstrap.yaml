@@ -11,5 +11,3 @@ spring:
         namespace: e545c141-f794-4b40-ad0e-bebff183e997
         server-addr: 121.40.210.58:8848
         file-extension: yaml
-server:
-  port: 88
