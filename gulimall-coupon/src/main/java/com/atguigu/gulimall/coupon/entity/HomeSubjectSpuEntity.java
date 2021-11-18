@@ -41,4 +41,43 @@ public class HomeSubjectSpuEntity implements Serializable {
 	 */
 	private Integer sort;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Long getSubjectId() {
+		return subjectId;
+	}
+
+	public void setSubjectId(Long subjectId) {
+		this.subjectId = subjectId;
+	}
+
+	public Long getSpuId() {
+		return spuId;
+	}
+
+	public void setSpuId(Long spuId) {
+		this.spuId = spuId;
+	}
+
+	public Integer getSort() {
+		return sort;
+	}
+
+	public void setSort(Integer sort) {
+		this.sort = sort;
+	}
 }

@@ -54,4 +54,67 @@ public class SeckillSkuRelationEntity implements Serializable {
 	 */
 	private Integer seckillSort;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getPromotionId() {
+		return promotionId;
+	}
+
+	public void setPromotionId(Long promotionId) {
+		this.promotionId = promotionId;
+	}
+
+	public Long getPromotionSessionId() {
+		return promotionSessionId;
+	}
+
+	public void setPromotionSessionId(Long promotionSessionId) {
+		this.promotionSessionId = promotionSessionId;
+	}
+
+	public Long getSkuId() {
+		return skuId;
+	}
+
+	public void setSkuId(Long skuId) {
+		this.skuId = skuId;
+	}
+
+	public BigDecimal getSeckillPrice() {
+		return seckillPrice;
+	}
+
+	public void setSeckillPrice(BigDecimal seckillPrice) {
+		this.seckillPrice = seckillPrice;
+	}
+
+	public BigDecimal getSeckillCount() {
+		return seckillCount;
+	}
+
+	public void setSeckillCount(BigDecimal seckillCount) {
+		this.seckillCount = seckillCount;
+	}
+
+	public BigDecimal getSeckillLimit() {
+		return seckillLimit;
+	}
+
+	public void setSeckillLimit(BigDecimal seckillLimit) {
+		this.seckillLimit = seckillLimit;
+	}
+
+	public Integer getSeckillSort() {
+		return seckillSort;
+	}
+
+	public void setSeckillSort(Integer seckillSort) {
+		this.seckillSort = seckillSort;
+	}
 }

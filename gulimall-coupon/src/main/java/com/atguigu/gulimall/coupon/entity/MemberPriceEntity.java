@@ -46,4 +46,51 @@ public class MemberPriceEntity implements Serializable {
 	 */
 	private Integer addOther;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getSkuId() {
+		return skuId;
+	}
+
+	public void setSkuId(Long skuId) {
+		this.skuId = skuId;
+	}
+
+	public Long getMemberLevelId() {
+		return memberLevelId;
+	}
+
+	public void setMemberLevelId(Long memberLevelId) {
+		this.memberLevelId = memberLevelId;
+	}
+
+	public String getMemberLevelName() {
+		return memberLevelName;
+	}
+
+	public void setMemberLevelName(String memberLevelName) {
+		this.memberLevelName = memberLevelName;
+	}
+
+	public BigDecimal getMemberPrice() {
+		return memberPrice;
+	}
+
+	public void setMemberPrice(BigDecimal memberPrice) {
+		this.memberPrice = memberPrice;
+	}
+
+	public Integer getAddOther() {
+		return addOther;
+	}
+
+	public void setAddOther(Integer addOther) {
+		this.addOther = addOther;
+	}
 }

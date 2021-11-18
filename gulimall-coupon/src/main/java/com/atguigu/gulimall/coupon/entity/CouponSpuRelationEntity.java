@@ -37,4 +37,35 @@ public class CouponSpuRelationEntity implements Serializable {
 	 */
 	private String spuName;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Long couponId) {
+		this.couponId = couponId;
+	}
+
+	public Long getSpuId() {
+		return spuId;
+	}
+
+	public void setSpuId(Long spuId) {
+		this.spuId = spuId;
+	}
+
+	public String getSpuName() {
+		return spuName;
+	}
+
+	public void setSpuName(String spuName) {
+		this.spuName = spuName;
+	}
 }

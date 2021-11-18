@@ -49,4 +49,59 @@ public class SeckillSkuNoticeEntity implements Serializable {
 	 */
 	private Integer noticeType;
 
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getMemberId() {
+		return memberId;
+	}
+
+	public void setMemberId(Long memberId) {
+		this.memberId = memberId;
+	}
+
+	public Long getSkuId() {
+		return skuId;
+	}
+
+	public void setSkuId(Long skuId) {
+		this.skuId = skuId;
+	}
+
+	public Long getSessionId() {
+		return sessionId;
+	}
+
+	public void setSessionId(Long sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public Date getSubcribeTime() {
+		return subcribeTime;
+	}
+
+	public void setSubcribeTime(Date subcribeTime) {
+		this.subcribeTime = subcribeTime;
+	}
+
+	public Date getSendTime() {
+		return sendTime;
+	}
+
+	public void setSendTime(Date sendTime) {
+		this.sendTime = sendTime;
+	}
+
+	public Integer getNoticeType() {
+		return noticeType;
+	}
+
+	public void setNoticeType(Integer noticeType) {
+		this.noticeType = noticeType;
+	}
 }
