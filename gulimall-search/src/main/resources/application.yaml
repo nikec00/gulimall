@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: gulimall-serach
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 121.40.210.58:8848
