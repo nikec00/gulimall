@@ -2,6 +2,7 @@ package com.atguigu.gulimall.product.service.impl;
 
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
@@ -55,6 +56,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -177,25 +184,25 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         QueryWrapper<SpuInfoEntity> wrapper = new QueryWrapper<>();
 
         String key = (String) params.get("key");
-        if(!StringUtils.isEmpty(key)){
-            wrapper.and((w)->{
-                w.eq("id",key).or().like("spu_name",key);
+        if (!StringUtils.isEmpty(key)) {
+            wrapper.and((w) -> {
+                w.eq("id", key).or().like("spu_name", key);
             });
         }
         // status=1 and (id=1 or spu_name like xxx)
         String status = (String) params.get("status");
-        if(!StringUtils.isEmpty(status)){
-            wrapper.eq("publish_status",status);
+        if (!StringUtils.isEmpty(status)) {
+            wrapper.eq("publish_status", status);
         }
 
         String brandId = (String) params.get("brandId");
-        if(!StringUtils.isEmpty(brandId)&&!"0".equalsIgnoreCase(brandId)){
-            wrapper.eq("brand_id",brandId);
+        if (!StringUtils.isEmpty(brandId) && !"0".equalsIgnoreCase(brandId)) {
+            wrapper.eq("brand_id", brandId);
         }
 
         String catelogId = (String) params.get("catelogId");
-        if(!StringUtils.isEmpty(catelogId)&&!"0".equalsIgnoreCase(catelogId)){
-            wrapper.eq("catalog_id",catelogId);
+        if (!StringUtils.isEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId)) {
+            wrapper.eq("catalog_id", catelogId);
         }
 
         /**
@@ -211,6 +218,35 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void up(Long spuId) {
+        //1.查出当前spu对应的sku信息，品牌的名字
+        List<SkuInfoEntity> list = skuInfoService.getSkuBySpuId(spuId);
+        // TODO 4 查询当前sku所有可以被检索的规格属性
+
+        // 2.封装每个sku的信息
+        List<SkuEsModel> collect = list.stream().map(sku -> {
+            //组装需要的数据
+            SkuEsModel esModel = new SkuEsModel();
+            BeanUtils.copyProperties(sku, esModel);
+            esModel.setSkuPrice(sku.getPrice());
+            esModel.setSkuImg(sku.getSkuDefaultImg());
+            // TODO 1 发送远程调用，库存系统查询是否有库存（不做精确计算）
+
+            // TODO 2 热度评分。0
+
+            // TODO 3 查询品牌和分类的名字信息
+            BrandEntity brand = brandService.getById(esModel.getBrandId());
+            esModel.setBrandName(brand.getName());
+            esModel.setBrandImg(brand.getLogo());
+            CategoryEntity cateGory = categoryService.getById(esModel.getCatalogId());
+            esModel.setCatalogName(cateGory.getName());
+            return esModel;
+        }).collect(Collectors.toList());
+
+        // TODO 5 将数据发送给ES保存：gulimall-search
     }
 
     private void saveBaseSpuInfo(SpuInfoEntity infoEntity) {
