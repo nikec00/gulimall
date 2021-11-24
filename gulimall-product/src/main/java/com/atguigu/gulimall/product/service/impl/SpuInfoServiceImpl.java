@@ -12,12 +12,11 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -225,6 +224,23 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //1.查出当前spu对应的sku信息，品牌的名字
         List<SkuInfoEntity> list = skuInfoService.getSkuBySpuId(spuId);
         // TODO 4 查询当前sku所有可以被检索的规格属性
+        // 查询出当前spuId下的所有规格属性
+        List<ProductAttrValueEntity> baseAttrs = attrValueService.baseAttrlistforspu(spuId);
+        // 过滤出属性id
+        List<Long> attrIds = baseAttrs.stream().map(attr -> {
+            return attr.getAttrId();
+        }).collect(Collectors.toList());
+        // 过滤出可被检索的属性id
+        List<Long> searchAttrIds = attrService.selectSearchAttrIds(attrIds);
+        Set<Long> idSet = new HashSet<>(searchAttrIds);
+        //检索出可以被检索的规格属性
+        List<SkuEsModel.Attrs> attrsList = baseAttrs.stream().filter(item -> {
+            return idSet.contains(item.getAttrId());
+        }).map(item -> {
+            SkuEsModel.Attrs attrs = new SkuEsModel.Attrs();
+            BeanUtils.copyProperties(item, attrs);
+            return attrs;
+        }).collect(Collectors.toList());
 
         // 2.封装每个sku的信息
         List<SkuEsModel> collect = list.stream().map(sku -> {
@@ -236,13 +252,15 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             // TODO 1 发送远程调用，库存系统查询是否有库存（不做精确计算）
 
             // TODO 2 热度评分。0
-
+            esModel.setHotScore(0L);
             // TODO 3 查询品牌和分类的名字信息
             BrandEntity brand = brandService.getById(esModel.getBrandId());
             esModel.setBrandName(brand.getName());
             esModel.setBrandImg(brand.getLogo());
             CategoryEntity cateGory = categoryService.getById(esModel.getCatalogId());
             esModel.setCatalogName(cateGory.getName());
+            //设置检索属性
+            esModel.setAttrs(attrsList);
             return esModel;
         }).collect(Collectors.toList());
 
