@@ -6,6 +6,7 @@ import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.product.entity.*;
 import com.atguigu.gulimall.product.feign.CouponFeignService;
+import com.atguigu.gulimall.product.feign.WareFeignService;
 import com.atguigu.gulimall.product.service.*;
 import com.atguigu.gulimall.product.vo.*;
 import lombok.AllArgsConstructor;
@@ -61,6 +62,9 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private WareFeignService wareFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -223,6 +227,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     public void up(Long spuId) {
         //1.查出当前spu对应的sku信息，品牌的名字
         List<SkuInfoEntity> list = skuInfoService.getSkuBySpuId(spuId);
+        List<Long> skuIds = list.stream().map(SkuInfoEntity::getSkuId).collect(Collectors.toList());
         // TODO 4 查询当前sku所有可以被检索的规格属性
         // 查询出当前spuId下的所有规格属性
         List<ProductAttrValueEntity> baseAttrs = attrValueService.baseAttrlistforspu(spuId);
@@ -242,7 +247,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             return attrs;
         }).collect(Collectors.toList());
 
+        Map<Long, Boolean> stockMap = null;
+        try {
+            R<List<SkuHasStockVo>> skusHasStock = wareFeignService.getSkusHasStock(skuIds);
+            stockMap = skusHasStock.getData().stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("库存服务查询异常：原因{}", e);
+        }
+
         // 2.封装每个sku的信息
+        Map<Long, Boolean> finalStockMap = stockMap;
         List<SkuEsModel> collect = list.stream().map(sku -> {
             //组装需要的数据
             SkuEsModel esModel = new SkuEsModel();
@@ -250,7 +265,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             esModel.setSkuPrice(sku.getPrice());
             esModel.setSkuImg(sku.getSkuDefaultImg());
             // TODO 1 发送远程调用，库存系统查询是否有库存（不做精确计算）
-
+            if (finalStockMap == null) {
+                esModel.setHasStock(true);
+            } else {
+                esModel.setHasStock(finalStockMap.get(sku.getSkuId()));
+            }
             // TODO 2 热度评分。0
             esModel.setHotScore(0L);
             // TODO 3 查询品牌和分类的名字信息
