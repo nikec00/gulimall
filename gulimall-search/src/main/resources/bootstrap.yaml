@@ -4,3 +4,5 @@ spring:
       config:
         server-addr: 121.40.210.58:8848
         namespace: efabe03e-579f-40ed-9531-770a44d4b379
+server:
+  port: 13000

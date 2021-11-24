@@ -254,8 +254,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         Map<Long, Boolean> stockMap = null;
         try {
-            R<List<SkuHasStockVo>> skusHasStock = wareFeignService.getSkusHasStock(skuIds);
-            stockMap = skusHasStock.getData().stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
+            List<SkuHasStockVo> skusHasStock = wareFeignService.getSkusHasStock(skuIds);
+            stockMap = skusHasStock.stream().collect(Collectors.toMap(SkuHasStockVo::getSkuId, item -> item.getHasStock()));
         } catch (Exception e) {
             e.printStackTrace();
             log.error("库存服务查询异常：原因{}", e);
@@ -289,7 +289,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         }).collect(Collectors.toList());
 
         // TODO 5 将数据发送给ES保存：gulimall-search
-        R r = searchFeignService.productStatusUp(collect);
+        R r = null;
+        try {
+            r = searchFeignService.productStatusUp(collect);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("search异常：{}",e);
+        }
         if (r.getCode() == 0) {
             //远程调用成功
             // TODO 6.修改spu的状态
