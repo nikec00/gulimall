@@ -1,0 +1,6 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: 121.40.210.58:8848
+        namespace: 3e632ffd-b2fd-4a12-bda4-d40c34bcf533
