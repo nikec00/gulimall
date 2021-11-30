@@ -15,7 +15,7 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
-    cache: false
+    cache: true
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml
@@ -26,4 +26,4 @@ mybatis-plus:
       logic-not-delete-value: 0
 logging:
   level:
-    com.atguigu.gulimall: debug
+    com.atguigu.gulimall: error
