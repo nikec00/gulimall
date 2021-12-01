@@ -16,6 +16,9 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
     cache: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml
