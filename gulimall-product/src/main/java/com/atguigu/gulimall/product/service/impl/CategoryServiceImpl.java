@@ -5,7 +5,10 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimall.product.service.CategoryBrandRelationService;
 import com.atguigu.gulimall.product.vo.Catelog2Vo;
 import org.apache.commons.lang.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -34,6 +37,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -89,9 +95,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         this.updateById(category);
         categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
     }
-
+    // 每一个需要缓存的数据我们都指定要放到哪个名字下的缓存【缓存的分区（按照业务类型分类）】
+    @Cacheable({"category"}) // 代表当前方法的结果需要缓存，如果缓存中有，方法不调用。如果缓存中没有，会调用方法，并保存缓存。
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
+        System.out.println("getLevel1Categorys。。。。。。");
         List<CategoryEntity> categoryEntities = baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("parent_cid", 0));
         return categoryEntities;
     }
@@ -107,11 +115,30 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         String catalogJSON = stringRedisTemplate.opsForValue().get("catalogJSON");
         if (StringUtils.isEmpty(catalogJSON)) {
             System.out.println("缓存不命中..查询了数据库..");
-            return getCatalogJsonFromDbWithRedisLocal();
+            return getCatalogJsonFromDbWithRedissonLock();
         }
         System.out.println("缓存命中。。直接返回");
         return JSON.parseObject(catalogJSON, new TypeReference<Map<String, List<Catelog2Vo>>>() {
         });
+    }
+
+    /**
+     * 使用redisson分布式锁
+     *
+     * @return
+     */
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDbWithRedissonLock() {
+        RLock lock = redissonClient.getLock("catalogJson-lock");
+        lock.lock();
+        System.out.println("获取分布式锁成功");
+        Map<String, List<Catelog2Vo>> dataFromDb;
+        try {
+            // 查数据库
+            dataFromDb = getDataFromDb();
+        } finally {
+            lock.unlock();
+        }
+        return dataFromDb;
     }
 
     /**
@@ -120,7 +147,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @return
      */
-    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDbWithRedisLocal() {
+    public Map<String, List<Catelog2Vo>> getCatalogJsonFromDbWithRedisLock() {
         String uuid = UUID.randomUUID().toString();
         Boolean lock = stringRedisTemplate.opsForValue().setIfAbsent("lock", uuid, 30, TimeUnit.SECONDS);
         if (lock) {
@@ -138,7 +165,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             //自旋：加索失败重试
             //休眠100ms重试
             System.out.println("获取分布式锁失败。。等待重试");
-            return getCatalogJsonFromDbWithRedisLocal();
+            return getCatalogJsonFromDbWithRedisLock();
         }
 
     }

@@ -19,6 +19,8 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
+  cache:
+    type: redis
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml
