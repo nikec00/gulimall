@@ -92,10 +92,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      * @param category
      */
 
-    @Caching(evict = {
-            @CacheEvict(value = "category",key = "'getLevel1Categorys'"),
-            @CacheEvict(value = "category",key = "'getCatalogJson'")
-    })
+//    @Caching(evict = {
+//            @CacheEvict(value = "category",key = "'getLevel1Categorys'"),
+//            @CacheEvict(value = "category",key = "'getCatalogJson'")
+//    })
+    @CacheEvict(value = "category",allEntries = true)//删除category分组下的所有key
     @Override
     @Transactional
     public void updateCasecade(CategoryEntity category) {
