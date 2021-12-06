@@ -23,6 +23,9 @@ spring:
     type: redis
     redis:
       time-to-live: 3600000
+      key-prefix: CACHE_
+      use-key-prefix: true
+      cache-null-values: true
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.product.entity
   mapper-locations: classpath:/mapper/product/*Dao.xml

@@ -8,7 +8,9 @@ import org.apache.commons.lang.StringUtils;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -89,30 +91,39 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @param category
      */
+
+    @Caching(evict = {
+            @CacheEvict(value = "category",key = "'getLevel1Categorys'"),
+            @CacheEvict(value = "category",key = "'getCatalogJson'")
+    })
     @Override
     @Transactional
     public void updateCasecade(CategoryEntity category) {
         this.updateById(category);
         categoryBrandRelationService.updateCategory(category.getCatId(), category.getName());
     }
-    // 每一个需要缓存的数据我们都指定要放到哪个名字下的缓存【缓存的分区（按照业务类型分类）】
 
     /**
-     * 1.@Cacheable({"category"})
-     *      代表当前方法的结果需要缓存，如果缓存中有，方法不被调用
-     *      如果缓存中没有，会调用方法，最后将方法的结果存入缓存中
+     * @Cacheable: 触发将数据保存到缓存的操作
+     * @CacheEvict: 触发将数据从缓存删除的操作
+     * @CachePut：不影响方法执行更新缓存
+     * @Caching：组合以上多种操作
+     * @CacheConfig：在类级别上共享缓存的相同配置 1.@Cacheable({"category"})
+     * 代表当前方法的结果需要缓存，如果缓存中有，方法不被调用
+     * 如果缓存中没有，会调用方法，最后将方法的结果存入缓存中
      * 2.默认行为
-     *  1）.如果缓存中有，方法不被调用
-     *  2）、key默认自动生成，缓存的名字::SimpleKey[]（自动生成key值）
-     *  3）、缓存的value值，默认使用序列化机制，将序列化的数据存到redis中
-     *  4）、默认ttl时间：-1
-     *
+     * 1）.如果缓存中有，方法不被调用
+     * 2）、key默认自动生成，缓存的名字::SimpleKey[]（自动生成key值）
+     * 3）、缓存的value值，默认使用序列化机制，将序列化的数据存到redis中
+     * 4）、默认ttl时间：-1
+     * <p>
      * 自定义：
-     *  1）、指定生成缓存使用的key：key属性指定，接受一个SpEl
-     *  2）、指定缓存数据的存存活时间，配置文件中修改
-     *  3）、将数据保存为json格式
+     * 1）、指定生成缓存使用的key：key属性指定，接受一个SpEl
+     * 2）、指定缓存数据的存存活时间，配置文件中修改
+     * 3）、将数据保存为json格式
      */
-    @Cacheable(value = {"category"},key = "#root.method.name") // 代表当前方法的结果需要缓存，如果缓存中有，方法不调用。如果缓存中没有，会调用方法，并保存缓存。
+    // 每一个需要缓存的数据我们都指定要放到哪个名字下的缓存【缓存的分区（按照业务类型分类）】
+    @Cacheable(value = {"category"}, key = "#root.method.name") // 代表当前方法的结果需要缓存，如果缓存中有，方法不调用。如果缓存中没有，会调用方法，并保存缓存。
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
         System.out.println("getLevel1Categorys。。。。。。");
@@ -120,8 +131,36 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return categoryEntities;
     }
 
+    @Cacheable(value = "category",key = "#root.methodName")
     @Override
     public Map<String, List<Catelog2Vo>> getCatalogJson() {
+        List<CategoryEntity> selectList = baseMapper.selectList(null);
+        List<CategoryEntity> level1Categorys = getParent_cid(selectList, 0L);
+        Map<String, List<Catelog2Vo>> parent_cid = level1Categorys.stream().collect(Collectors.toMap(k -> k.getCatId().toString(), v -> {
+            // 每一个1级分类，查到这个一级分类的二级分类
+            List<CategoryEntity> entities = getParent_cid(selectList, v.getParentCid());
+            List<Catelog2Vo> collect = null;
+            if (entities != null) {
+                collect = entities.stream().map(l2 -> {
+                    Catelog2Vo catelog2Vo = new Catelog2Vo(v.getCatId().toString(), null, l2.getCatId().toString(), l2.getName());
+                    // 找当前分类的三级分类
+                    List<CategoryEntity> categoryEntities3 = getParent_cid(selectList, l2.getCatId());
+                    if (categoryEntities3 != null) {
+                        List<Catelog2Vo.Catelog3Vo> catelog3Vos = categoryEntities3.stream().map(l3 -> {
+                            Catelog2Vo.Catelog3Vo catelog3Vo = new Catelog2Vo.Catelog3Vo(l2.getCatId().toString(), l3.getCatId().toString(), l3.getName());
+                            return catelog3Vo;
+                        }).collect(Collectors.toList());
+                        catelog2Vo.setCatalog3List(catelog3Vos);
+                    }
+                    return catelog2Vo;
+                }).collect(Collectors.toList());
+            }
+            return collect;
+        }));
+        return parent_cid;
+    }
+
+    public Map<String, List<Catelog2Vo>> getCatalogJson2() {
         // 加入缓存逻辑
         /**
          * 1.空结果缓存，解决缓存穿透
