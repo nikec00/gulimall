@@ -42,7 +42,7 @@ public class SearchParam implements Serializable {
     /**
      * 是否只显示有货
      */
-    private Integer hasStock;
+    private Integer hasStock = 1;
 
     /**
      * 价格区间查询
@@ -62,7 +62,7 @@ public class SearchParam implements Serializable {
     /**
      * 页码
      */
-    private Integer pageNum;
+    private Integer pageNum = 1;
 
 
 }

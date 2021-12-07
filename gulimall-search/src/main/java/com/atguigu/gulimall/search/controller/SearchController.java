@@ -27,7 +27,7 @@ public class SearchController {
      * @return
      */
     @GetMapping("list.html")
-    public String listPage(@RequestBody SearchParam searchParam, Model model) {
+    public String listPage(SearchParam searchParam, Model model) {
         //1.根据传递来的查询参数，去es中检索商品
         SearchResult res = mallSearchService.search(searchParam);
         model.addAttribute("result", res);

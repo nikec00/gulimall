@@ -120,7 +120,7 @@
         "path": "attrs"
       },
       "aggs": {
-        "nested_agg": {
+        "attr_id_agg": {
           "terms": {
             "field": "attrs.attrId",
             "size": 100
