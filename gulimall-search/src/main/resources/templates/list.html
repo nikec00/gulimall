@@ -402,7 +402,7 @@
         <a href="http://gulimall.com"><img src="/static/search/./image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
-        <input id="keyword_input" type="text" placeholder="手机"/>
+        <input id="keyword_input" type="text" placeholder="手机" th:value="${param.keyword}"/>
         <a href="javascript:searchByKeyword();">搜索</a>
     </div>
     <div class="header_ico">
@@ -1043,12 +1043,35 @@
                 <div class="filter">
                     <!--综合排序-->
                     <div class="filter_top">
-                        <div class="filter_top_left">
-                            <a href="/static/search/#">综合排序</a>
-                            <a href="/static/search/#">销量</a>
-                            <a href="/static/search/#">价格</a>
-                            <a href="/static/search/#">评论分</a>
-                            <a href="/static/search/#">上架时间</a>
+                        <div class="filter_top_left" th:with="p = ${param.sort}, priceRange = ${param.skuPrice}">
+                            <a sort="hotScore"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'hotScore') && #strings.endsWith(p,'desc')) ? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(#strings.isEmpty(p) || #strings.startsWith(p,'hotScore')) ?
+                                   'color: #fff; border-color: #e4393c; background: #e4393c;':'color: #333; border-color: #ccc; background: #fff;' }">
+                                综合排序[[${(!#strings.isEmpty(p) && #strings.startsWith(p,'hotScore') &&
+                                #strings.endsWith(p,'desc')) ?'↑':'↓' }]]</a>
+                            <a sort="saleCount"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount') && #strings.endsWith(p,'desc')) ? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount')) ?
+                                   'color: #fff; border-color: #e4393c; background: #e4393c;':'color: #333; border-color: #ccc; background: #fff;' }">
+                                销量[[${(!#strings.isEmpty(p) && #strings.startsWith(p,'saleCount') &&
+                                #strings.endsWith(p,'desc'))?'↑':'↓' }]]</a>
+                            <a sort="skuPrice"
+                               th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice') && #strings.endsWith(p,'desc')) ? 'sort_a desc' : 'sort_a'}"
+                               th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice')) ?
+                                   'color: #fff; border-color: #e4393c; background: #e4393c;':'color: #333; border-color: #ccc; background: #fff;' }">
+                                价格[[${(!#strings.isEmpty(p) && #strings.startsWith(p,'skuPrice') &&
+                                #strings.endsWith(p,'desc'))?'↑':'↓' }]]</a>
+                            <a class="sort_a" href="/static/search/#">评论分</a>
+                            <a class="sort_a" href="/static/search/#">上架时间</a>
+                            <input id="skuPriceFrom" type="number"
+                                   th:value="${#strings.isEmpty(priceRange)?'':#strings.substringBefore(priceRange,'_')}"
+                                   style="width: 100px; margin-left: 30px">
+                            -
+                            <input id="skuPriceTo" type="number"
+                                   th:value="${#strings.isEmpty(priceRange)?'':#strings.substringAfter(priceRange,'_')}"
+                                   style="width: 100px">
+                            <button id="skuPriceSearchBtn">确定</button>
                         </div>
                         <div class="filter_top_right">
                             <span class="fp-text">
@@ -1223,8 +1246,11 @@
                                 <a class="page_a" th:attr="pn=${result.pageNum - 1}" th:if="${result.pageNum > 1}">
                                     < 上一页
                                 </a>
-                                <a class="page_a" th:attr="pn=${nav},style=${nav == result.pageNum ? 'border: 0;color:#ee2222;background: #fff' : ''}" th:each="nav:${result.pageNavs}">[[${nav}]]</a>
-                                <a class="page_a" th:attr="pn=${result.pageNum + 1}" th:if="${result.pageNum < result.totalPages}">
+                                <a class="page_a"
+                                   th:attr="pn=${nav},style=${nav == result.pageNum ? 'border: 0;color:#ee2222;background: #fff' : ''}"
+                                   th:each="nav:${result.pageNavs}">[[${nav}]]</a>
+                                <a class="page_a" th:attr="pn=${result.pageNum + 1}"
+                                   th:if="${result.pageNum < result.totalPages}">
                                     下一页 >
                                 </a>
                             </span>
@@ -1982,12 +2008,8 @@
     })
 
     function searchProducts(name, value) {
-        var href = location.href + "";
-        if (href.includes("?")) {
-            location.href = location.href + "&" + name + "=" + value;
-        } else {
-            location.href = location.href + "?" + name + "=" + value;
-        }
+        //原來的页面
+        location.href = replaceParamVal(location.href, name, value, true)
 
     }
 
@@ -1995,23 +2017,92 @@
         searchProducts('keyword', $('#keyword_input').val())
     }
 
-    $(".page_a").click(function (){
-       var pn = $(this).attr('pn');
-       var href = location.href
-       if (href.indexOf("pageNum") != -1){
-           location.href = replaceParamVal(href,"pageNum",pn)
-       }else {
-           location.href = location.href + "&pageNum=" + pn;
-       }
-       return false;
+    $(".page_a").click(function () {
+        var pn = $(this).attr('pn');
+        var href = location.href
+        if (href.indexOf("pageNum") != -1) {
+            location.href = replaceParamVal(href, "pageNum", pn)
+        } else {
+            location.href = location.href + "&pageNum=" + pn;
+        }
+        return false;
     })
 
-    function replaceParamVal(url,paramName,replaceVal){
-        var oUrl = url.toString()
-        var re = eval('/(' + paramName + '=)([^&]*)/gi');
-        var nUrl = oUrl.replace(re,paramName+ '='+replaceVal)
-        return nUrl
+    function replaceParamVal(url, paramName, replaceVal, forceAdd) {
+        var oUrl = url.toString();
+        var nUrl;
+        if (oUrl.indexOf(paramName) != -1) {
+            if (forceAdd) {
+                if (oUrl.indexOf("?") != -1) {
+                    nUrl = oUrl + "&" + paramName + "=" + replaceVal;
+                } else {
+                    nUrl = oUrl + "?" + paramName + "=" + replaceVal;
+                }
+            } else {
+                var re = eval('/(' + paramName + '=)([^&]*)/gi');
+                nUrl = oUrl.replace(re, paramName + '=' + replaceVal);
+            }
+        } else {
+            if (oUrl.indexOf("?") != -1) {
+                nUrl = oUrl + "&" + paramName + "=" + replaceVal;
+            } else {
+                nUrl = oUrl + "?" + paramName + "=" + replaceVal;
+            }
+        }
+        return nUrl;
     }
+
+    $(".sort_a").click(function () {
+        changeStyle(this);
+        let sort = $(this).attr("sort");
+        sort = $(this).hasClass("desc") ? sort + "_desc" : sort + "_asc";
+        location.href = replaceParamVal(location.href, "sort", sort, false);
+
+        return false;
+    });
+
+    function changeStyle(ele) {
+        // location.href = replaceParamVal(href, "pageNum", pn,flase);
+        // color: #333; border-color: #ccc; background: #fff
+        // color: #fff; border-color: #e4393c; background: #e4393c
+        $(".sort_a").css({"color": "#333", "border-color": "#ccc", "background": "#fff"});
+        $(".sort_a").each(function () {
+            let text = $(this).text().replace("↓", "").replace("↑", "");
+            $(this).text(text);
+        })
+
+        $(ele).css({"color": "#FFF", "border-color": "#e4393c", "background": "#e4393c"});
+        $(ele).toggleClass("desc");
+
+        if ($(ele).hasClass("desc")) {
+            let text = $(ele).text().replace("↓", "").replace("↑", "");
+            text = text + "↓";
+            $(ele).text(text);
+        } else {
+            let text = $(ele).text().replace("↓", "").replace("↑", "");
+            text = text + "↑";
+            $(ele).text(text);
+        }
+    };
+    $("#skuPriceSearchBtn").click(function () {
+        let from = $(`#skuPriceFrom`).val();
+        let to = $(`#skuPriceTo`).val();
+
+        let query = from + "_" + to;
+        location.href = replaceParamVal(location.href, "skuPrice", query, false);
+    });
+
+
+    $("#showHasStock").change(function () {
+        alert($(this).prop("checked"));
+        if ($(this).prop("checked")) {
+            location.href = replaceParamVal(location.href, "hasStock", 1, false);
+        } else {
+            let re = eval('/(hasStock=)([^&]*)/gi');
+            location.href = (location.href + "").replace(re, "");
+        }
+        return false;
+    });
 </script>
 </body>
 </html>

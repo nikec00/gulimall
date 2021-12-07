@@ -52,4 +52,10 @@ public class SearchResult implements Serializable {
      */
     private List<CatalogVo> catalogs;
 
+    /**
+     * 面包屑导航数据
+     */
+    private List<NavVo> navs;
+
+
 }

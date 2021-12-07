@@ -2,8 +2,10 @@ package com.atguigu.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.atguigu.common.to.es.SkuEsModel;
+import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.search.config.GulimallElasticSearchConfig;
 import com.atguigu.gulimall.search.constant.EsConstant;
+import com.atguigu.gulimall.search.feign.ProductFeignService;
 import com.atguigu.gulimall.search.service.MallSearchService;
 import com.atguigu.gulimall.search.vo.*;
 import org.apache.commons.lang.StringUtils;
@@ -48,6 +50,9 @@ public class MallSearchServiceImpl implements MallSearchService {
 
     @Autowired
     private RestHighLevelClient client;
+
+    @Autowired
+    private ProductFeignService feignService;
 
     @Override
     public SearchResult search(SearchParam searchParam) {
