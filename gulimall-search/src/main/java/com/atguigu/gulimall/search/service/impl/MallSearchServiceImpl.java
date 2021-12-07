@@ -27,6 +27,7 @@ import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -90,7 +91,9 @@ public class MallSearchServiceImpl implements MallSearchService {
             boolQuery.filter(QueryBuilders.termsQuery("brandId", brandIds));
         }
         Integer hasStock = searchParam.getHasStock();
-        boolQuery.filter(QueryBuilders.termQuery("hasStock", hasStock == 1));
+        if (hasStock != null) {
+            boolQuery.filter(QueryBuilders.termQuery("hasStock", hasStock == 1));
+        }
         String skuPrice = searchParam.getSkuPrice();
         if (!StringUtils.isEmpty(skuPrice)) {
             RangeQueryBuilder rangeQuery = QueryBuilders.rangeQuery("skuPrice");
@@ -183,6 +186,11 @@ public class MallSearchServiceImpl implements MallSearchService {
             for (SearchHit hit : hits.getHits()) {
                 String asString = hit.getSourceAsString();
                 SkuEsModel esModel = JSON.parseObject(asString, SkuEsModel.class);
+                if (!StringUtils.isEmpty(searchParam.getKeyword())) {
+                    HighlightField skuTitle = hit.getHighlightFields().get("skuTitle");
+                    String string = skuTitle.getFragments()[0].string();
+                    esModel.setSkuTitle(string);
+                }
                 skuList.add(esModel);
             }
         }
@@ -245,6 +253,11 @@ public class MallSearchServiceImpl implements MallSearchService {
         //7.分页信息：总页码
         int totalPages = (int) (total % EsConstant.PRODUCT_PAGESIZE == 0 ? total / EsConstant.PRODUCT_PAGESIZE : (total / EsConstant.PRODUCT_PAGESIZE + 1));
         result.setTotalPages(totalPages);
+        List<Integer> pageNavs = new ArrayList<>();
+        for (int i = 1; i < totalPages; i++) {
+            pageNavs.add(i);
+        }
+        result.setPageNavs(pageNavs);
         return result;
     }
 

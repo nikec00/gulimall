@@ -35,6 +35,8 @@ public class SearchResult implements Serializable {
      */
     private Integer totalPages;
 
+    private List<Integer> pageNavs;
+
     /**
      * 涉及品牌
      */
