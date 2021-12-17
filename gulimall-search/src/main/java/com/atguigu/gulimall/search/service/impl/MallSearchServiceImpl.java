@@ -124,7 +124,7 @@ public class MallSearchServiceImpl implements MallSearchService {
                 String attrId = s[0];
                 String[] attrValues = s[1].split(":");
                 query.must(QueryBuilders.termQuery("attrs.attrId", attrId));
-                query.must(QueryBuilders.termsQuery("attrs.attrValue", attrValues));
+                query.must(QueryBuilders.termsQuery("at                                                                                                         trs.attrValue", attrValues));
                 NestedQueryBuilder nestedQuery = QueryBuilders.nestedQuery("attrs", query, ScoreMode.None);
                 boolQuery.filter(nestedQuery);
             }
