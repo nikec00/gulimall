@@ -1,7 +1,5 @@
 package com.atguigu.gulimall.search.thread;
 
-import com.sun.prism.shader.Solid_TextureYV12_AlphaTest_Loader;
-
 import java.util.concurrent.*;
 
 /**
@@ -31,6 +29,7 @@ public class ThreadTest {
         Object o = futureTask.get();
         System.out.println(o);
 
+
         /**
          * 4.通过线程池方式
          */
@@ -40,6 +39,26 @@ public class ThreadTest {
             threadPool.execute(new MyThread());
         } finally {
             threadPool.shutdown();
+        }
+
+        /**
+         * 自定义线程池
+         */
+        ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(
+                2,
+                10,
+                5,
+                TimeUnit.SECONDS,
+                new ArrayBlockingQueue<>(3),
+                Executors.defaultThreadFactory(),
+                new ThreadPoolExecutor.AbortPolicy()
+        );
+        try {
+            poolExecutor.execute(new MyRunnable());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            poolExecutor.shutdown();
         }
 
     }
