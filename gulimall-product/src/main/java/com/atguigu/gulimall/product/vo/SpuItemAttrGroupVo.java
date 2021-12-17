@@ -1,6 +1,7 @@
 package com.atguigu.gulimall.product.vo;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -10,9 +11,10 @@ import java.util.List;
  * @Date: 2021/12/17 18:00
  */
 @Data
+@ToString
 public class SpuItemAttrGroupVo {
 
-    private SkuItemVo groupName;
+    private String groupName;
 
-    private List<SpuBaseAttrVo> attrs;
+    private List<Attr> attrs;
 }
