@@ -21,6 +21,8 @@ public class SkuItemVo implements Serializable {
 
     private SkuInfoEntity info;
 
+    private boolean hasStock = true;
+
     private List<SkuImagesEntity> images;
 
     private List<SkuItemSaleAttrVo> saleAttr;
