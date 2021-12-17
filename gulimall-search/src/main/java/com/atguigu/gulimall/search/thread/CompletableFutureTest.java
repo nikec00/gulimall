@@ -13,14 +13,14 @@ public class CompletableFutureTest {
             new ArrayBlockingQueue<>(3), Executors.defaultThreadFactory(), new ThreadPoolExecutor.DiscardPolicy());
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        System.out.println("main...start...");
+//        System.out.println("main...start...");
 //        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
 //            System.out.println(Thread.currentThread().getName() + "当前线程开始执行");
 //            int i = 10 / 2;
 //            System.out.println("运行结果：" + i);
 //        }, threadPool);
 //        System.out.println("main...end...");
-
+//
 //        CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {
 //            System.out.println(Thread.currentThread().getName() + "当前线程开始执行");
 //            int i = 10 / 0;
