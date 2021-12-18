@@ -25,7 +25,7 @@ public class MyThreadConfig {
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(properties.getCoreSize(), properties.getMaxSize(), properties.getKeepAliveTime(),
-                TimeUnit.SECONDS, new ArrayBlockingQueue<>(100000),
+                TimeUnit.SECONDS, new ArrayBlockingQueue<>(300),
                 Executors.defaultThreadFactory(), new ThreadPoolExecutor.AbortPolicy());
         return threadPoolExecutor;
     }
