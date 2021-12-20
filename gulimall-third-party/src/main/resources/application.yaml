@@ -7,6 +7,13 @@ spring:
       secret-key: w4gZOVoY6k5kFj6PSSGzfe8PsLelzT
       oss:
         endpoint: oss-cn-hangzhou.aliyuncs.com
+      sms:
+        host: http://fesms.market.alicloudapi.com
+        path: /sms/
+        sign: 1
+        skin: 1
+        appCode: 46fa8dfaf32a442bbe72bef09ee05a37
+
     nacos:
       discovery:
         server-addr: 121.40.210.58:8848
