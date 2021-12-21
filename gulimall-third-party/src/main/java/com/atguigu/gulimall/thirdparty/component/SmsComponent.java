@@ -26,7 +26,6 @@ import java.util.Map;
 @Data
 public class SmsComponent {
 
-
     private String host;
 
     private String path;
