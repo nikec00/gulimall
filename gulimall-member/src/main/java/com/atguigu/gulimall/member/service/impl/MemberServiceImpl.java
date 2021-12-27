@@ -4,9 +4,11 @@ import com.atguigu.gulimall.member.dao.MemberLevelDao;
 import com.atguigu.gulimall.member.entity.MemberLevelEntity;
 import com.atguigu.gulimall.member.exception.PhoneException;
 import com.atguigu.gulimall.member.exception.UserNameException;
+import com.atguigu.gulimall.member.vo.MemberLoginVo;
 import com.atguigu.gulimall.member.vo.MemberRegistVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -51,7 +53,10 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         memberEntity.setMobile(memberRegistVo.getPhone());
         memberEntity.setUsername(memberRegistVo.getUserName());
         // 密码要进行加密存储
-        memberEntity.setPassword("");
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String pwd = passwordEncoder.encode(memberRegistVo.getPassword());
+        memberEntity.setPassword(pwd);
+        // 保存数据库
         baseMapper.insert(memberEntity);
     }
 
@@ -70,6 +75,26 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             throw new UserNameException();
         }
 
+    }
+
+    @Override
+    public MemberEntity login(MemberLoginVo memberLoginVo) {
+        String loginacct = memberLoginVo.getLoginacct();
+        String password = memberLoginVo.getPassword();
+        //1.去数据库查询密码
+        MemberEntity selectOne = baseMapper.selectOne(new QueryWrapper<MemberEntity>().eq("username", loginacct).or().eq("mobile", loginacct));
+        if (selectOne == null) {
+            return null;
+        } else {
+            String pwdDb = selectOne.getPassword();
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            boolean matches = passwordEncoder.matches(password, pwdDb);
+            if (matches) {
+                return selectOne;
+            } else {
+                return null;
+            }
+        }
     }
 
 }

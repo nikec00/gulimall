@@ -1,10 +1,14 @@
 package com.atguigu.gulimall.auth.controller;
 
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.constant.AuthServerConstant;
 import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.common.utils.R;
+import com.atguigu.gulimall.auth.feign.MemberFeignClient;
 import com.atguigu.gulimall.auth.feign.ThirdPartFeignService;
+import com.atguigu.gulimall.auth.vo.UserLoginVo;
 import com.atguigu.gulimall.auth.vo.UserRegistVo;
+import com.sun.media.sound.ModelAbstractOscillator;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
@@ -38,6 +42,9 @@ public class LoginController {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private MemberFeignClient memberFeignClient;
 
     /**
      * 发送短信验证码
@@ -84,9 +91,20 @@ public class LoginController {
         if (!StringUtils.isEmpty(s)) {
             String rdsCode = s.split("_")[0];
             if (code.equals(rdsCode)) {
-                // 真正注册，调用远程服务进行注册
-                // 删除验证码
                 redisTemplate.delete(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
+                // 真正注册，调用远程服务进行注册
+                R r = memberFeignClient.regist(vo);
+                if (r.getCode() == 0) {
+                    //成功
+                    return "redirect:http://auth.gulimall.com/login.html";
+                } else {
+                    Map<String, String> errors = new HashMap<>(1);
+                    errors.put("msg", r.getData("msg", new TypeReference<String>() {
+                    }));
+                    redirectAttributes.addFlashAttribute("errors", errors);
+                    return "redirect:http://auth.gulimall.com/reg.html";
+                }
+                // 删除验证码
             } else {
                 Map<String, String> errors = new HashMap<>();
                 errors.put("code", "验证码错误");
@@ -99,8 +117,19 @@ public class LoginController {
             redirectAttributes.addFlashAttribute("errors", errors);
             return "redirect:http://auth.gulimall.com/reg.html";
         }
+    }
 
-
-        return "redirect:/login.html";
+    @PostMapping("/login")
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes) {
+        // 远程登录
+        R login = memberFeignClient.login(vo);
+        if (login.getCode() == 0) {
+            return "redirect:http://gulimall.com";
+        } else {
+            Map<String, String> errors = new HashMap<>(1);
+            errors.put("msg",login.getData("msg",new TypeReference<String>(){}));
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.gulimall.com/login.html";
+        }
     }
 }

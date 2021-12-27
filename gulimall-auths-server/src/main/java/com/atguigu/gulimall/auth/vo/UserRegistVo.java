@@ -28,10 +28,8 @@ public class UserRegistVo {
     private String password;
 
     @NotEmpty(message = "手机号必须提交")
-    @Pattern(regexp = "^[0]([3-9])[0-9]{9}$",message = "手机号格式非法")
     private String phone;
 
     @NotEmpty(message = "验证码必须提交")
-    @Length(min = 6,max = 6)
     private String code ;
 }

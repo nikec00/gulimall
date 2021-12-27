@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.gulimall.member.exception.PhoneException;
+import com.atguigu.gulimall.member.exception.UserNameException;
+import com.atguigu.gulimall.member.vo.MemberLoginVo;
 import com.atguigu.gulimall.member.vo.MemberRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +31,20 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
+
+    @PostMapping("/login")
+    public R login(@RequestBody MemberLoginVo memberLoginVo) {
+        MemberEntity memberEntity = memberService.login(memberLoginVo);
+        if (memberEntity != null) {
+            return R.ok();
+        } else {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getMsg());
+        }
+    }
+
     /**
      * 会员注册
+     *
      * @param memberRegistVo
      * @return
      */
@@ -36,8 +52,12 @@ public class MemberController {
     public R regist(@RequestBody MemberRegistVo memberRegistVo) {
         try {
             memberService.regist(memberRegistVo);
-        } catch (Exception e) {
+        } catch (PhoneException e) {
             e.printStackTrace();
+            return R.error(BizCodeEnum.PHONE_EXIST_EXCEPTION.getCode(), BizCodeEnum.PHONE_EXIST_EXCEPTION.getMsg());
+        } catch (UserNameException e) {
+            e.printStackTrace();
+            return R.error(BizCodeEnum.USER_EXIST_EXCEPTION.getCode(), BizCodeEnum.USER_EXIST_EXCEPTION.getMsg());
         }
         return R.ok();
     }
