@@ -71,14 +71,36 @@ public class LoginController {
         if (result.hasErrors()) {
             // 校验出错转发到注册页
             List<FieldError> fieldErrors = result.getFieldErrors();
-            Map<String,String> errors = new HashMap<>(fieldErrors.size());
+            Map<String, String> errors = new HashMap<>(fieldErrors.size());
             for (FieldError fieldError : fieldErrors) {
-                errors.put(fieldError.getField(),fieldError.getDefaultMessage());
+                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
             }
             redirectAttributes.addFlashAttribute("errors", errors);
             return "redirect:http://auth.gulimall.com/reg.html";
-
         }
+        //1.校验验证码
+        String code = vo.getCode();
+        String s = redisTemplate.opsForValue().get(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
+        if (!StringUtils.isEmpty(s)) {
+            String rdsCode = s.split("_")[0];
+            if (code.equals(rdsCode)) {
+                // 真正注册，调用远程服务进行注册
+                // 删除验证码
+                redisTemplate.delete(AuthServerConstant.SMS_CODE_CACHE_PREFIX + vo.getPhone());
+            } else {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("code", "验证码错误");
+                redirectAttributes.addFlashAttribute("errors", errors);
+                return "redirect:http://auth.gulimall.com/reg.html";
+            }
+        } else {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("code", "验证码错误");
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:http://auth.gulimall.com/reg.html";
+        }
+
+
         return "redirect:/login.html";
     }
 }

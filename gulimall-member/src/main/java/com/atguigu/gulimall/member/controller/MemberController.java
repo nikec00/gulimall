@@ -4,12 +4,9 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.member.vo.MemberRegistVo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.atguigu.gulimall.member.entity.MemberEntity;
 import com.atguigu.gulimall.member.service.MemberService;
@@ -25,15 +22,30 @@ import com.atguigu.common.utils.R;
  * @date 2021-11-02 23:24:09
  */
 @RestController
-@RequestMapping("member/member" )
+@RequestMapping("member/member")
 public class MemberController {
     @Autowired
     private MemberService memberService;
 
     /**
+     * 会员注册
+     * @param memberRegistVo
+     * @return
+     */
+    @PostMapping("/regist")
+    public R regist(@RequestBody MemberRegistVo memberRegistVo) {
+        try {
+            memberService.regist(memberRegistVo);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return R.ok();
+    }
+
+    /**
      * 列表
      */
-    @RequestMapping("/list" )
+    @RequestMapping("/list")
     // @RequiresPermissions("member:member:list")
     public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = memberService.queryPage(params);
@@ -45,10 +57,10 @@ public class MemberController {
     /**
      * 信息
      */
-    @RequestMapping("/info/{id}" )
+    @RequestMapping("/info/{id}")
     // @RequiresPermissions("member:member:info")
-    public R info(@PathVariable("id" ) Long id) {
-            MemberEntity member = memberService.getById(id);
+    public R info(@PathVariable("id") Long id) {
+        MemberEntity member = memberService.getById(id);
 
         return R.ok().put("member", member);
     }
@@ -56,10 +68,10 @@ public class MemberController {
     /**
      * 保存
      */
-    @RequestMapping("/save" )
+    @RequestMapping("/save")
     // @RequiresPermissions("member:member:save")
     public R save(@RequestBody MemberEntity member) {
-            memberService.save(member);
+        memberService.save(member);
 
         return R.ok();
     }
@@ -67,10 +79,10 @@ public class MemberController {
     /**
      * 修改
      */
-    @RequestMapping("/update" )
+    @RequestMapping("/update")
     // @RequiresPermissions("member:member:update")
     public R update(@RequestBody MemberEntity member) {
-            memberService.updateById(member);
+        memberService.updateById(member);
 
         return R.ok();
     }
@@ -78,10 +90,10 @@ public class MemberController {
     /**
      * 删除
      */
-    @RequestMapping("/delete" )
+    @RequestMapping("/delete")
     // @RequiresPermissions("member:member:delete")
     public R delete(@RequestBody Long[] ids) {
-            memberService.removeByIds(Arrays.asList(ids));
+        memberService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }
