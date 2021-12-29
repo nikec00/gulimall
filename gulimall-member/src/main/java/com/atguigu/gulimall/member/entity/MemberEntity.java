@@ -25,6 +25,18 @@ public class MemberEntity implements Serializable {
 	@TableId
 	private Long id;
 	/**
+	 * 社交登录访问令牌
+	 */
+	private String accessToken;
+	/**
+	 * 社交登录过期时间
+	 */
+	private Long expiresIn;
+	/**
+	 * 社交登录唯一标识
+	 */
+	private String socialUid;
+	/**
 	 * 会员等级id
 	 */
 	private Long levelId;

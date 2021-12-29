@@ -5,6 +5,7 @@ import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
 import com.atguigu.common.exception.BizCodeEnum;
+import com.atguigu.common.vo.SocialUser;
 import com.atguigu.gulimall.member.exception.PhoneException;
 import com.atguigu.gulimall.member.exception.UserNameException;
 import com.atguigu.gulimall.member.vo.MemberLoginVo;
@@ -32,10 +33,10 @@ public class MemberController {
     private MemberService memberService;
 
     @PostMapping("/oauth2/login")
-    public R oauthLogin(@RequestBody MemberLoginVo memberLoginVo) {
-        MemberEntity memberEntity = memberService.login(memberLoginVo);
+    public R oauthLogin(@RequestBody SocialUser socialUser) {
+        MemberEntity memberEntity = memberService.login(socialUser);
         if (memberEntity != null) {
-            return R.ok();
+            return R.ok().setData(memberEntity);
         } else {
             return R.error(BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getMsg());
         }

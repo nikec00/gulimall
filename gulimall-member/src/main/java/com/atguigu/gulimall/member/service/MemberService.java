@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.member.service;
 
+import com.atguigu.common.vo.SocialUser;
 import com.atguigu.gulimall.member.exception.PhoneException;
 import com.atguigu.gulimall.member.exception.UserNameException;
 import com.atguigu.gulimall.member.vo.MemberLoginVo;
@@ -27,7 +28,8 @@ public interface MemberService extends IService<MemberEntity> {
 
     void checkUserNameUnique(String userName) throws UserNameException;
 
-
     MemberEntity login(MemberLoginVo memberLoginVo);
+
+    MemberEntity login(SocialUser socialUser);
 }
 
