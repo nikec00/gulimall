@@ -31,6 +31,15 @@ public class MemberController {
     @Autowired
     private MemberService memberService;
 
+    @PostMapping("/oauth2/login")
+    public R oauthLogin(@RequestBody MemberLoginVo memberLoginVo) {
+        MemberEntity memberEntity = memberService.login(memberLoginVo);
+        if (memberEntity != null) {
+            return R.ok();
+        } else {
+            return R.error(BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getCode(), BizCodeEnum.LOGINACCT_PASSWORD_INVAILD_EXCEPTION.getMsg());
+        }
+    }
 
     @PostMapping("/login")
     public R login(@RequestBody MemberLoginVo memberLoginVo) {

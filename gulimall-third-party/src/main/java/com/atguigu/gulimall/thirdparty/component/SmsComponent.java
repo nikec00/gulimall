@@ -26,7 +26,6 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "spring.cloud.alicloud.sms")
 @Component
 @Data
-@EnableAsync
 public class SmsComponent {
 
     private String host;
