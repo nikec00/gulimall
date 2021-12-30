@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,7 @@ public class Oauth2Controller {
     private MemberFeignClient memberFeignClient;
 
     @GetMapping("/oauth2.0/weibo/success")
-    public String weibo(@RequestParam("code") String code) throws Exception {
+    public String weibo(@RequestParam("code") String code, HttpSession session) throws Exception {
         //1.根据code换取access_token
         Map<String, String> map = new HashMap<>();
         map.put("client_id", "2360416674");
@@ -51,6 +52,11 @@ public class Oauth2Controller {
                 });
                 System.out.println("登录成功，用户信息：" + respVo.toString());
                 log.info("登录成功，用户信息{}", respVo.toString());
+                //1.第一次使用session：命令浏览器保存JSESSIONID这个cookie
+                //以后浏览器访问哪个网站就会带上这个网站的cookie
+                //子域之间：gulimall.com auth.gulimall.com...
+                //发卡的时候，即使是子域系统发的卡，也能让父类直接使用
+                session.setAttribute("loginUser", respVo);
                 //3.登录成功跳回首页
                 return "redirect:http://gulimall.com";
             } else {
