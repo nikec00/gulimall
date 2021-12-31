@@ -17,3 +17,9 @@ server:
   servlet:
     session:
       timeout: 30m
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 6000
+        readTimeout: 6000

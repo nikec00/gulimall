@@ -56,6 +56,8 @@ public class Oauth2Controller {
                 //以后浏览器访问哪个网站就会带上这个网站的cookie
                 //子域之间：gulimall.com auth.gulimall.com...
                 //发卡的时候，即使是子域系统发的卡，也能让父类直接使用
+                //todo 1.默认发的令牌。作用域：当前域名（解决session共享问题）
+                //todo 2.使用json的序列化方式来序列化对象到redis中
                 session.setAttribute("loginUser", respVo);
                 //3.登录成功跳回首页
                 return "redirect:http://gulimall.com";
