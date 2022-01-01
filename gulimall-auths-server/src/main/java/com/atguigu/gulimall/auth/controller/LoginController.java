@@ -4,6 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.constant.AuthServerConstant;
 import com.atguigu.common.exception.BizCodeEnum;
 import com.atguigu.common.utils.R;
+import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.auth.feign.MemberFeignClient;
 import com.atguigu.gulimall.auth.feign.ThirdPartFeignService;
 import com.atguigu.gulimall.auth.vo.UserLoginVo;
@@ -20,6 +21,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -45,6 +47,17 @@ public class LoginController {
 
     @Autowired
     private MemberFeignClient memberFeignClient;
+
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session) {
+        Object loginUser = session.getAttribute("loginUser");
+        if (loginUser == null) {
+            //没登录
+            return "login";
+        } else {
+            return "redirect://gulimall.com";
+        }
+    }
 
     /**
      * 发送短信验证码
@@ -120,14 +133,18 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes) {
+    public String login(UserLoginVo vo, RedirectAttributes redirectAttributes, HttpSession httpSession) {
         // 远程登录
         R login = memberFeignClient.login(vo);
         if (login.getCode() == 0) {
+            MemberRespVo respVo = login.getData(new TypeReference<MemberRespVo>() {
+            });
+            httpSession.setAttribute("loginUser", respVo);
             return "redirect:http://gulimall.com";
         } else {
             Map<String, String> errors = new HashMap<>(1);
-            errors.put("msg",login.getData("msg",new TypeReference<String>(){}));
+            errors.put("msg", login.getData("msg", new TypeReference<String>() {
+            }));
             redirectAttributes.addFlashAttribute("errors", errors);
             return "redirect:http://auth.gulimall.com/login.html";
         }

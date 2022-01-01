@@ -61,6 +61,7 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
 
         memberEntity.setMobile(memberRegistVo.getPhone());
         memberEntity.setUsername(memberRegistVo.getUserName());
+        memberEntity.setNickname(memberRegistVo.getUserName());
         // 密码要进行加密存储
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String pwd = passwordEncoder.encode(memberRegistVo.getPassword());
@@ -127,8 +128,8 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             try {
                 //没有查到当前社交用户对应的记录我们就需要注册一个
                 Map<String, String> query = new HashMap<>();
-                query.put("access_token",socialUser.getAccess_token());
-                query.put("uid",socialUser.getUid());
+                query.put("access_token", socialUser.getAccess_token());
+                query.put("uid", socialUser.getUid());
                 //获取微博登录用户信息
                 HttpResponse response = HttpUtils.doGet("https://api.weibo.com", "/2/users/show.json", "get", new HashMap<String, String>(), query);
                 if (response.getStatusLine().getStatusCode() == 200) {

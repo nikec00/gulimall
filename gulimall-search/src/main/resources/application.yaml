@@ -1,4 +1,9 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
+  session:
+    store-type: redis
   application:
     name: gulimall-search
   cloud:
