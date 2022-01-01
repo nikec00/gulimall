@@ -5,6 +5,11 @@ spring:
     nacos:
       discovery:
         server-addr: 121.40.210.58:8848
+  session:
+    store-type: redis
+  redis:
+    host: localhost
+    port: 6379
 server:
   port: 30001
 
