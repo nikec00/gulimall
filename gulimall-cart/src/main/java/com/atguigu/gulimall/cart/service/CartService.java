@@ -9,4 +9,6 @@ import com.atguigu.gulimall.cart.vo.CartItem;
  */
 public interface CartService {
     CartItem addCartItem(Long skuId, Integer num);
+
+    CartItem getCartItem(Long skuId);
 }

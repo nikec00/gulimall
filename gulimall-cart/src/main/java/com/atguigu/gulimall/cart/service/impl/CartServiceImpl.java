@@ -86,6 +86,19 @@ public class CartServiceImpl implements CartService {
         }
     }
 
+    /**
+     * 获取购物车的某个购物项
+     * @param skuId
+     * @return
+     */
+    @Override
+    public CartItem getCartItem(Long skuId) {
+        BoundHashOperations<String, Object, Object> cartOps = getCartOps();
+        String str = cartOps.get(skuId.toString()).toString();
+        CartItem cartItem = JSON.parseObject(str, CartItem.class);
+        return cartItem;
+    }
+
     /***
      * 获取到我们要操作的购物车
      * @return

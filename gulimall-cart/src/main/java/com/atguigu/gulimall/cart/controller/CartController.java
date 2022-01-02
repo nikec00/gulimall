@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpSession;
 
@@ -43,11 +44,19 @@ public class CartController {
 
     /**
      * 添加商品加入购物车
+     * redirectAttributes.addAttribute()将数据放在redirect后面
      */
     @GetMapping("/addCartItem")
-    public String addCartItem(@RequestParam("skuId") Long skuId, @RequestParam("num") Integer num, Model model) {
-        CartItem cartItem = cartService.addCartItem(skuId, num);
-        model.addAttribute("item", cartItem);
+    public String addCartItem(@RequestParam("skuId") Long skuId, @RequestParam("num") Integer num, RedirectAttributes redirectAttributes) {
+        cartService.addCartItem(skuId, num);
+        redirectAttributes.addAttribute("skuId", skuId);
+        return "redirect:http://cart.gulimall.com/addToCartSuccess.html";
+    }
+
+    @GetMapping("/addToCartSuccess.html")
+    public String addToCartSuccess(@RequestParam("skuId") Long skuId, Model model) {
+        CartItem cartItem = cartService.getCartItem(skuId);
+        model.addAttribute("item",cartItem);
         return "success";
     }
 }
