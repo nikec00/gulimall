@@ -1,6 +1,10 @@
 server:
   port: 9000
 spring:
+  rabbitmq:
+    virtual-host: /
+    host: 121.40.210.58
+    port: 5672
   application:
     name: gulimall-order
   datasource:
