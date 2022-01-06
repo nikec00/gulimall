@@ -12,6 +12,9 @@ spring:
     #    只要抵达队列，以异步方式优先回调returnconfirm
     template:
       mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
   application:
     name: gulimall-order
   datasource:
