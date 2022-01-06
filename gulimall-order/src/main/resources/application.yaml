@@ -5,6 +5,13 @@ spring:
     virtual-host: /
     host: 121.40.210.58
     port: 5672
+    #    开启发送端消息抵达broker确认
+    publisher-confirms: true
+    #    开启发送端消息抵达队列确认
+    publisher-returns: true
+    #    只要抵达队列，以异步方式优先回调returnconfirm
+    template:
+      mandatory: true
   application:
     name: gulimall-order
   datasource:
