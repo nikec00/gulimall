@@ -58,8 +58,10 @@ public class Cart implements Serializable {
         //1.计算购物项总价
         if (this.items != null && this.items.size() > 0) {
             for (CartItem item : this.items) {
-                BigDecimal totalPrice = item.getTotalPrice();
-                decimal = decimal.add(totalPrice);
+                if (item.getCheck()) {
+                    BigDecimal totalPrice = item.getTotalPrice();
+                    decimal = decimal.add(totalPrice);
+                }
             }
         }
         //2.减去优惠总价
