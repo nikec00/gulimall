@@ -1,20 +1,20 @@
 package com.atguigu.gulimall.order.vo;
 
-import lombok.Data;
-
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * @Description：
+ * @Description：购物项
  * @Author: nkc
- * @Date: 2022/1/7 23:47
+ * @Date: 2022/1/1 15:36
  */
-@Data
-public class OrderItemVo {
+public class OrderItemVo implements Serializable {
+    private static final long serialVersionUID = 9120587280831958794L;
+
     private Long skuId;
 
-    private Boolean check;
+    private Boolean check = true;
 
     private String title;
 
@@ -27,4 +27,68 @@ public class OrderItemVo {
     private Integer count;
 
     private BigDecimal totalPrice;
+
+    public Long getSkuId() {
+        return skuId;
+    }
+
+    public void setSkuId(Long skuId) {
+        this.skuId = skuId;
+    }
+
+    public Boolean getCheck() {
+        return check;
+    }
+
+    public void setCheck(Boolean check) {
+        this.check = check;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public List<String> getSkuAttr() {
+        return skuAttr;
+    }
+
+    public void setSkuAttr(List<String> skuAttr) {
+        this.skuAttr = skuAttr;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public BigDecimal getTotalPrice() {
+        return this.price.multiply(new BigDecimal("" + this.count));
+    }
+
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 }
