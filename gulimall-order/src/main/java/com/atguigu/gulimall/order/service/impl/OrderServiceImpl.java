@@ -3,10 +3,12 @@ package com.atguigu.gulimall.order.service.impl;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
+import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginInterceptor;
 import com.atguigu.gulimall.order.vo.OrderItemVo;
 import com.atguigu.gulimall.order.vo.MemberAddressVo;
 import com.atguigu.gulimall.order.vo.OrderConfirmVo;
+import com.atguigu.gulimall.order.vo.SkuStockVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -41,6 +44,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     @Autowired
     private ThreadPoolExecutor executor;
 
+    @Autowired
+    private WmsFeignService wmsFeignService;
+
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
         IPage<OrderEntity> page = this.page(
@@ -55,13 +61,13 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     public OrderConfirmVo confirmOrder() {
         OrderConfirmVo confirmVo = new OrderConfirmVo();
         MemberRespVo memberRespVo = LoginInterceptor.threadLocal.get();
-        System.out.println("主线程..."+Thread.currentThread().getId());
+        System.out.println("主线程..." + Thread.currentThread().getId());
         //获取之前的请求
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         //异步任务编排
         CompletableFuture<Void> getAddressFuture = CompletableFuture.runAsync(() -> {
             //1、远程查询所有的收货地址列表
-            System.out.println("member线程..."+Thread.currentThread().getId());
+            System.out.println("member线程..." + Thread.currentThread().getId());
             //每一个线程都来共享之前的请求数据
             RequestContextHolder.setRequestAttributes(requestAttributes);
             List<MemberAddressVo> address = memberFeignService.getAddress(memberRespVo.getId());
@@ -70,12 +76,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         CompletableFuture<Void> cartFuture = CompletableFuture.runAsync(() -> {
             //2、远程查询购物车所有选中的购物项
-            System.out.println("cart线程..."+Thread.currentThread().getId());
+            System.out.println("cart线程..." + Thread.currentThread().getId());
             //每一个线程都来共享之前的请求数据
             RequestContextHolder.setRequestAttributes(requestAttributes);
             List<OrderItemVo> items = cartFeignService.getCurrentUserCartItems();
             confirmVo.setItems(items);
             //feign在远程调用之前要构造请求，调用很多拦截器RequestInterceptor interceptor: requestInterceptors
+        }, executor).thenRunAsync(() -> {
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+            List<OrderItemVo> items = confirmVo.getItems();
+            List<Long> collect = items.stream().map(OrderItemVo::getSkuId).collect(Collectors.toList());
+            List<SkuStockVo> skuStockVos = wmsFeignService.getSkusHasStock(collect);
+            if (skuStockVos != null) {
+                Map<Long, Boolean> map = skuStockVos.stream().collect(Collectors.toMap(SkuStockVo::getSkuId, SkuStockVo::getHasStock));
+                confirmVo.setStocks(map);
+            }
         }, executor);
 
 
@@ -87,7 +102,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         //5、TODO 防重令牌想·
         try {
-            CompletableFuture.allOf(getAddressFuture,cartFuture).get();
+            CompletableFuture.allOf(getAddressFuture, cartFuture).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {

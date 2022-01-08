@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description： 订单确认页需要用的数据展示
@@ -32,6 +33,9 @@ public class OrderConfirmVo implements Serializable {
     @Setter
     @Getter
     private Integer integration;
+
+    private Map<Long, Boolean> stocks;
+
 
     //订单总额
 //    private BigDecimal total;
@@ -101,5 +105,13 @@ public class OrderConfirmVo implements Serializable {
     //应付
     public BigDecimal getPayPrice() {
         return getTotal();
+    }
+
+    public Map<Long, Boolean> getStocks() {
+        return stocks;
+    }
+
+    public void setStocks(Map<Long, Boolean> stocks) {
+        this.stocks = stocks;
     }
 }
