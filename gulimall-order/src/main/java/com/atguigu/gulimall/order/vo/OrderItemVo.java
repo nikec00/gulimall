@@ -28,6 +28,26 @@ public class OrderItemVo implements Serializable {
 
     private BigDecimal totalPrice;
 
+    private Boolean hasStock;
+
+    private BigDecimal weight;
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
+
+    public Boolean getHasStock() {
+        return hasStock;
+    }
+
+    public void setHasStock(Boolean hasStock) {
+        this.hasStock = hasStock;
+    }
+
     public Long getSkuId() {
         return skuId;
     }

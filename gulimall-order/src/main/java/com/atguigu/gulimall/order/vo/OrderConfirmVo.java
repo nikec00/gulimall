@@ -43,6 +43,16 @@ public class OrderConfirmVo implements Serializable {
     @Getter
     private String orderToken;
 
+    public Integer getCount() {
+        Integer i = 0;
+        if (items != null) {
+            for (OrderItemVo item : items) {
+                i += item.getCount();
+            }
+        }
+        return i;
+    }
+
     public List<MemberAddressVo> getAddress() {
         return address;
     }

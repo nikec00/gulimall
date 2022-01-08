@@ -33,10 +33,18 @@ spring:
         server-addr: 121.40.210.58:8848
   thymeleaf:
     cache: false
-
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.order.entity
   mapper-locations: classpath:/mapper/order/*Dao.xml
   global-config:
     db-config:
       id-type: auto
+feign:
+  client:
+    config:
+      gulimall-member:
+        connectTimeout: 10000
+        readTimeout: 10000
+      gulimall-cart:
+        connectTimeout: 10000
+        readTimeout: 10000
