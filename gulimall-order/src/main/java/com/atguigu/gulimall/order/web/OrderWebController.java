@@ -2,13 +2,17 @@ package com.atguigu.gulimall.order.web;
 
 import com.atguigu.gulimall.order.service.OrderService;
 import com.atguigu.gulimall.order.vo.OrderConfirmVo;
+import com.atguigu.gulimall.order.vo.OrderSubmitVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * @Descriptionï¼š
+ * @Description£º
  * @Author: nkc
  * @Date: 2022/1/7 23:27
  */
@@ -24,4 +28,19 @@ public class OrderWebController {
         model.addAttribute("orderConfirm", confirmVo);
         return "confirm";
     }
+
+    /**
+     * ÏÂµ¥¹¦ÄÜ
+     * @param orderSubmitVo
+     * @return
+     */
+    @PostMapping("/submitOrder")
+    public String submitOrder(OrderSubmitVo orderSubmitVo) {
+        //ÏÂµ¥£ºÈ¥´´½¨¶©µ¥£¬ÑéÁîÅÆ£¬Ñé¼Û¸ñ£¬Ëø¿â´æ
+        //ÏÂµ¥³É¹¦À´µ½Ö§¸¶Ñ¡ÔñÒ³
+        //ÏÂµ¥Ê§°Ü»Øµ½¶©µ¥È·ÈÏÒ³ÖØÐÂÈ·ÈÏ¶©µ¥ÐÅÏ¢
+        System.out.println("¶©µ¥Ìá½»µÄÊý¾Ý£º" + orderSubmitVo);
+        return null;
+    }
+
 }

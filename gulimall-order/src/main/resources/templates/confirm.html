@@ -730,7 +730,12 @@
 				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥<b id="payPrice">[[${#numbers.formatDecimal(orderConfirm.payPrice, 1, 2)}]]</b></span>
 				<p class="yfze_b">寄送至： <span id="receiveAddress"></span> 收货人：<span id="receiver"></span></p>
 			</div>
-			<button class="tijiao">提交订单</button>
+			<form action="http://order.gulimall.com/submitOrder" method="post">
+				<input id="addrInput" type="hidden" name="addrId" />
+				<input id="payPriceInput" type="hidden" name="payPrice">
+				<input type="hidden" name="orderToken" th:value="${orderConfirm.orderToken}">
+				<button class="tijiao" type="submit">提交订单</button>
+			</form>
 		</div>
 		</div>
 
