@@ -713,7 +713,7 @@
 				</p>
 				<p class="qian_y">
 					<span>运费： </span>
-					<span class="rmb"> &nbsp ￥0.00</span>
+					<span class="rmb"> &nbsp ￥<b id="fare"></b></span>
 				</p>
 				<p class="qian_y">
 					<span>服务费： </span>
@@ -727,7 +727,7 @@
 			</div>
 
 			<div class="yfze">
-				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥[[${#numbers.formatDecimal(orderConfirm.payPrice, 1, 2)}]]</span></p>
+				<p class="yfze_a"><span class="z">应付总额：</span><span class="hq">￥<b id="payPrice">[[${#numbers.formatDecimal(orderConfirm.payPrice, 1, 2)}]]</b></span>
 				<p class="yfze_b">寄送至：  收货人：</p>
 			</div>
 			<button class="tijiao">提交订单</button>
@@ -938,34 +938,75 @@
 		</div>
 		<script>
 			$(document).ready(function () {
-                $('.header-right li:nth-of-type(6)').hover(function(){
-                    $('.header-r-11').css('display','block')
-                },function(){
-                    $('.header-r-11').css('display','none')
-                })
-                $('.header-right li:nth-of-type(12)').hover(function(){
-                    $('.header-r-2').css('display','block')
-                },function(){
-                    $('.header-r-2').css('display','none')
-                })
-                $('.header-right li:nth-of-type(14)').hover(function(){
-                    $('.header-r-3').css('display','block')
-                },function(){
-                    $('.header-r-3').css('display','none')
-                })
-                $('.header-l-2').hover(function(){
-                    $('.header-l-d').css('display','block')
-                },function(){
-                    $('.header-l-d').css('display','none')
-                })
-                $('.header-r-4').hover(function(){
-                    $('.h-r-1').css('display','block')
-                },function(){
-                    $('.h-r-1').css('display','none')
-                })
-            })
+				$('.header-right li:nth-of-type(6)').hover(function () {
+					$('.header-r-11').css('display', 'block')
+				}, function () {
+					$('.header-r-11').css('display', 'none')
+				})
+				$('.header-right li:nth-of-type(12)').hover(function () {
+					$('.header-r-2').css('display', 'block')
+				}, function () {
+					$('.header-r-2').css('display', 'none')
+				})
+				$('.header-right li:nth-of-type(14)').hover(function () {
+					$('.header-r-3').css('display', 'block')
+				}, function () {
+					$('.header-r-3').css('display', 'none')
+				})
+				$('.header-l-2').hover(function () {
+					$('.header-l-d').css('display', 'block')
+				}, function () {
+					$('.header-l-d').css('display', 'none')
+				})
+				$('.header-r-4').hover(function () {
+					$('.h-r-1').css('display', 'block')
+				}, function () {
+					$('.h-r-1').css('display', 'none')
+				});
+
+				highlightAddress();
+				var addrId = $(".addr-item p[def='1']").attr("addrId");
+				getFare(addrId)
+			});
 
 
+			function highlightAddress() {
+				$(".addr-item p").css({"border": "2px solid gray"});
+				$(".addr-item p[def='1']").css({"border": "2px solid red"});
+			}
+
+			$(".addr-item p").click(function () {
+				$(".addr-item p").attr("def", "0");
+				$(this).attr("def", "1");
+				highlightAddress();
+
+				//获取到当前地址id
+				var addrId = $(this).attr("addrId");
+
+				//发送ajax请求获取运费信息
+				getFare(addrId);
+			});
+
+			//查运费
+			function getFare(addrId) {
+				//给表单回填选择的地址
+				$("#addrInput").val(addrId);
+				$.get("http://gulimall.com/api/ware/wareinfo/fare?addrId=" + addrId, function (resp) {
+					debugger
+					console.log(resp);
+					$("#fare").text(resp.data);
+					var total = [[${orderConfirm.total}]];
+
+					var payPrice = total * 1 + resp.data * 1;
+					//设置运费
+					$("#payPrice").text(payPrice);
+					$("#payPriceInput").val(payPrice);
+
+					//设置收获地址人信息
+					$("#receiveAddress").text(resp.data.address.province + " " + resp.data.address.city + " " + " " + resp.data.address.region + resp.data.address.detailAddress);
+					$("#receiver").text(resp.data.address.name);
+				})
+			}
 		</script>
 	</body>
 
