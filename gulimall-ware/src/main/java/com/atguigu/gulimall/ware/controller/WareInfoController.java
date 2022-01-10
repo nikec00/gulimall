@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 // import org.apache.shiro.authz.annotation.RequiresPermissions;
+import com.atguigu.gulimall.ware.vo.FareVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,8 +30,8 @@ public class WareInfoController {
 
     @GetMapping("/fare")
     public R getFare(@RequestParam("addrId") Long addrId) {
-        BigDecimal bigDecimal = wareInfoService.getFare(addrId);
-        return R.ok().setData(bigDecimal);
+        FareVo fare = wareInfoService.getFare(addrId);
+        return R.ok().setData(fare);
     }
 
     /**
