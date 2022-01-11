@@ -1,5 +1,7 @@
 package com.atguigu.gulimall.order.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
+import com.atguigu.common.utils.R;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.constant.OrderConstant;
 import com.atguigu.gulimall.order.feign.CartFeignService;
@@ -7,10 +9,14 @@ import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginInterceptor;
 import com.atguigu.gulimall.order.vo.*;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,6 +41,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 
 @Service("orderService")
 public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> implements OrderService {
+
+    private ThreadLocal<OrderSubmitVo> orderSubmitVoThreadLocal = new ThreadLocal<>();
 
     @Autowired
     private MemberFeignService memberFeignService;
@@ -107,7 +115,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //5、TODO 防重令牌想·
         String token = UUID.randomUUID().toString().replace("-", "");
         confirmVo.setOrderToken(token);
-        redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId(), token,30, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId(), token, 30, TimeUnit.MINUTES);
         try {
             CompletableFuture.allOf(getAddressFuture, cartFuture).get();
         } catch (InterruptedException e) {
@@ -120,8 +128,46 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo orderSubmitVo) {
-
+        SubmitOrderResponseVo responseVo = new SubmitOrderResponseVo();
+        MemberRespVo memberRespVo = LoginInterceptor.threadLocal.get();
+        orderSubmitVoThreadLocal.set(orderSubmitVo);
+        // 1.验证令牌【令牌对比和删除必须保证原子性】
+        // 0令牌失败 1删除成功
+        String orderToken = orderSubmitVo.getOrderToken();
+        String script = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
+        Long result = redisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Arrays.asList(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberRespVo.getId()), orderToken);
+        if (result == 0L) {
+            //验证失败
+            responseVo.setCode(0);
+            return responseVo;
+        } else {
+            //令牌验证成功
+            //下单：去创建订单，验令牌，验价格，锁库存
+            OrderCreateTo order = createOrder();
+        }
         return null;
+    }
+
+    private OrderCreateTo createOrder() {
+        OrderCreateTo to = new OrderCreateTo();
+        // 生成一个订单号
+        OrderEntity entity = new OrderEntity();
+        String orderSn = IdWorker.getTimeId();
+        //获取收费地址信息
+        OrderSubmitVo submitVo = orderSubmitVoThreadLocal.get();
+        R fare = wmsFeignService.getFare(submitVo.getAddrId());
+        FareVo fareResp = fare.getData(new TypeReference<FareVo>() {
+        });
+        entity.setFreightAmount(fareResp.getFare());
+        //设置收货人信息
+        entity.setReceiverCity(fareResp.getAddress().getCity());
+        entity.setReceiverDetailAddress(fareResp.getAddress().getDetailAddress());
+        entity.setReceiverName(fareResp.getAddress().getName());
+        entity.setReceiverPhone(fareResp.getAddress().getPhone());
+        entity.setReceiverPostCode(fareResp.getAddress().getPostCode());
+        entity.setReceiverProvince(fareResp.getAddress().getProvince());
+        entity.setReceiverRegion(fareResp.getAddress().getRegion());
+        return to;
     }
 
 }
