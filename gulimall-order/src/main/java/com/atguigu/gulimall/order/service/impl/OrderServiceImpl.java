@@ -6,10 +6,7 @@ import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginInterceptor;
-import com.atguigu.gulimall.order.vo.OrderItemVo;
-import com.atguigu.gulimall.order.vo.MemberAddressVo;
-import com.atguigu.gulimall.order.vo.OrderConfirmVo;
-import com.atguigu.gulimall.order.vo.SkuStockVo;
+import com.atguigu.gulimall.order.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -119,6 +116,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             e.printStackTrace();
         }
         return confirmVo;
+    }
+
+    @Override
+    public SubmitOrderResponseVo submitOrder(OrderSubmitVo orderSubmitVo) {
+
+        return null;
     }
 
 }
