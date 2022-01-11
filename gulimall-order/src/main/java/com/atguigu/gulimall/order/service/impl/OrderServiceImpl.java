@@ -4,6 +4,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.utils.R;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.constant.OrderConstant;
+import com.atguigu.gulimall.order.entity.OrderItemEntity;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.WmsFeignService;
@@ -151,8 +152,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     private OrderCreateTo createOrder() {
         OrderCreateTo to = new OrderCreateTo();
         // 生成一个订单号
-        OrderEntity entity = new OrderEntity();
         String orderSn = IdWorker.getTimeId();
+        OrderEntity orderEntity = buildOrder(orderSn);
+        // 获取到所有订单项信息
+        List<OrderItemEntity> itemEntities = buildOrderItems();
+
+        return to;
+    }
+
+    private OrderEntity buildOrder(String orderSn) {
+        OrderEntity entity = new OrderEntity();
+        entity.setOrderSn(orderSn);
         //获取收费地址信息
         OrderSubmitVo submitVo = orderSubmitVoThreadLocal.get();
         R fare = wmsFeignService.getFare(submitVo.getAddrId());
@@ -167,7 +177,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         entity.setReceiverPostCode(fareResp.getAddress().getPostCode());
         entity.setReceiverProvince(fareResp.getAddress().getProvince());
         entity.setReceiverRegion(fareResp.getAddress().getRegion());
-        return to;
+        return entity;
+    }
+
+    /**
+     * 构建所有订单项数据
+     *
+     * @param
+     * @return
+     */
+    private List<OrderItemEntity> buildOrderItems() {
+        List<OrderItemVo> currentUserCartItems = cartFeignService.getCurrentUserCartItems();
+        if (currentUserCartItems != null && currentUserCartItems.size() > 0) {
+            List<OrderItemEntity> itemEntities = currentUserCartItems.stream().map(cartItem -> {
+                OrderItemEntity orderItemEntity = buildOrderItem(cartItem);
+                return orderItemEntity;
+            }).collect(Collectors.toList());
+            return itemEntities;
+        }
+        return null;
+    }
+
+    /**
+     * 构建每一个指定的订单项数据
+     *
+     * @param cartItem
+     * @return
+     */
+    private OrderItemEntity buildOrderItem(OrderItemVo cartItem) {
+        return null;
     }
 
 }
