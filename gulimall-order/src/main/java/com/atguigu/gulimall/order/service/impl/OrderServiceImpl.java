@@ -151,12 +151,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     private OrderCreateTo createOrder() {
         OrderCreateTo to = new OrderCreateTo();
-        // 生成一个订单号
+        // 1.生成一个订单号
         String orderSn = IdWorker.getTimeId();
         OrderEntity orderEntity = buildOrder(orderSn);
-        // 获取到所有订单项信息
+        // 2.获取到所有订单项信息
         List<OrderItemEntity> itemEntities = buildOrderItems();
-
+        // 3.验价
         return to;
     }
 
