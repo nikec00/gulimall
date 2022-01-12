@@ -49,10 +49,6 @@ public class SpuInfoVo {
      */
     private Date updateTime;
 
-    public static long getSerialVersionUID() {
-        return serialVersionUID;
-    }
-
     public Long getId() {
         return id;
     }

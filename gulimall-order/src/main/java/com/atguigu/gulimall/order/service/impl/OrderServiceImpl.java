@@ -172,12 +172,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         BigDecimal coupon = new BigDecimal("0.0");
         BigDecimal integration = new BigDecimal("0.0");
         BigDecimal promotion = new BigDecimal("0.0");
+        BigDecimal gift = new BigDecimal("0.0");
+        BigDecimal growth = new BigDecimal("0.0");
         //订单总额，叠加每一项的订单项总额信息
         for (OrderItemEntity entity : itemEntities) {
             coupon = coupon.add(entity.getCouponAmount());
             integration = integration.add(entity.getIntegrationAmount());
             promotion = promotion.add(entity.getPromotionAmount());
             total = total.add(entity.getRealAmount());
+            gift = gift.add(new BigDecimal(entity.getGiftIntegration().toString()));
+            growth = growth.add(new BigDecimal(entity.getGiftGrowth().toString()));
         }
         //1.订单价格相关的
         orderEntity.setTotalAmount(total);
@@ -208,6 +212,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         //设置订单的相关状态信息
         entity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
+        entity.setAutoConfirmDay(7);
+
         return entity;
     }
 
