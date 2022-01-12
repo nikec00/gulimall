@@ -5,6 +5,7 @@ import com.atguigu.common.utils.R;
 import com.atguigu.common.vo.MemberRespVo;
 import com.atguigu.gulimall.order.constant.OrderConstant;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
+import com.atguigu.gulimall.order.enume.OrderStatusEnum;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
 import com.atguigu.gulimall.order.feign.ProductFeignService;
@@ -161,8 +162,30 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         OrderEntity orderEntity = buildOrder(orderSn);
         // 2.获取到所有订单项信息
         List<OrderItemEntity> itemEntities = buildOrderItems(orderSn);
-        // 3.验价
+        // 3.计算价格相关数据
+        computePrice(orderEntity, itemEntities);
         return to;
+    }
+
+    private void computePrice(OrderEntity orderEntity, List<OrderItemEntity> itemEntities) {
+        BigDecimal total = new BigDecimal("0.0");
+        BigDecimal coupon = new BigDecimal("0.0");
+        BigDecimal integration = new BigDecimal("0.0");
+        BigDecimal promotion = new BigDecimal("0.0");
+        //订单总额，叠加每一项的订单项总额信息
+        for (OrderItemEntity entity : itemEntities) {
+            coupon = coupon.add(entity.getCouponAmount());
+            integration = integration.add(entity.getIntegrationAmount());
+            promotion = promotion.add(entity.getPromotionAmount());
+            total = total.add(entity.getRealAmount());
+        }
+        //1.订单价格相关的
+        orderEntity.setTotalAmount(total);
+        //应付总额
+        orderEntity.setPayAmount(total.add(orderEntity.getFreightAmount()));
+        orderEntity.setPromotionAmount(promotion);
+        orderEntity.setIntegrationAmount(integration);
+        orderEntity.setCouponAmount(coupon);
     }
 
     private OrderEntity buildOrder(String orderSn) {
@@ -182,6 +205,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         entity.setReceiverPostCode(fareResp.getAddress().getPostCode());
         entity.setReceiverProvince(fareResp.getAddress().getProvince());
         entity.setReceiverRegion(fareResp.getAddress().getRegion());
+
+        //设置订单的相关状态信息
+        entity.setStatus(OrderStatusEnum.CREATE_NEW.getCode());
         return entity;
     }
 
@@ -217,7 +243,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //2.商品spu信息
         Long skuId = cartItem.getSkuId();
         R info = productFeignService.getSpuInfoBySkuId(skuId);
-        SpuInfoVo infoVo = info.getData(new TypeReference<SpuInfoVo>() {});
+        SpuInfoVo infoVo = info.getData(new TypeReference<SpuInfoVo>() {
+        });
         itemEntity.setSpuId(infoVo.getId());
         itemEntity.setSpuBrand(infoVo.getId().toString());
         itemEntity.setSpuName(infoVo.getSpuName());
@@ -234,6 +261,16 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //5.积分信息
         itemEntity.setGiftGrowth(cartItem.getPrice().intValue());
         itemEntity.setGiftIntegration(cartItem.getPrice().intValue());
+        //6.订单项的价格信息
+        itemEntity.setPromotionAmount(new BigDecimal("0"));
+        itemEntity.setCouponAmount(new BigDecimal("0"));
+        itemEntity.setIntegrationAmount(new BigDecimal("0"));
+        //当前订单项的实际金额 总额减去各种优惠
+        BigDecimal orgin = itemEntity.getSkuPrice().multiply(new BigDecimal(itemEntity.getSkuQuantity().toString()));
+        BigDecimal subtract = orgin.subtract(itemEntity.getCouponAmount()).subtract(itemEntity.getPromotionAmount()).subtract(itemEntity.getIntegrationAmount());
+        itemEntity.setRealAmount(subtract);
+
+
         return itemEntity;
     }
 
