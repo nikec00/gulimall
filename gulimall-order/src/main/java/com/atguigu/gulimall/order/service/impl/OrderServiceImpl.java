@@ -190,6 +190,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderEntity.setPromotionAmount(promotion);
         orderEntity.setIntegrationAmount(integration);
         orderEntity.setCouponAmount(coupon);
+
+        //设置积分等信息
+        orderEntity.setIntegration(gift.intValue());
+        orderEntity.setGrowth(growth.intValue());
     }
 
     private OrderEntity buildOrder(String orderSn) {
@@ -265,8 +269,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         itemEntity.setSkuQuantity(cartItem.getCount());
         //4.优惠信息[不做]
         //5.积分信息
-        itemEntity.setGiftGrowth(cartItem.getPrice().intValue());
-        itemEntity.setGiftIntegration(cartItem.getPrice().intValue());
+        itemEntity.setGiftGrowth(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
+        itemEntity.setGiftIntegration(cartItem.getPrice().multiply(new BigDecimal(cartItem.getCount().toString())).intValue());
         //6.订单项的价格信息
         itemEntity.setPromotionAmount(new BigDecimal("0"));
         itemEntity.setCouponAmount(new BigDecimal("0"));
