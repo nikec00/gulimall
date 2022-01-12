@@ -294,7 +294,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             r = searchFeignService.productStatusUp(collect);
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("search异常：{}",e);
+            log.error("search异常：{}", e);
         }
         if (r.getCode() == 0) {
             //远程调用成功
@@ -305,6 +305,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             //TODO 接口幂等性，重试机制
 
         }
+    }
+
+    @Override
+    public SpuInfoEntity getSpuInfoBySkuId(Long skuId) {
+        SkuInfoEntity entity = skuInfoService.getById(skuId);
+        Long spuId = entity.getSpuId();
+        SpuInfoEntity infoEntity = this.getById(spuId);
+        return infoEntity;
     }
 
     private void saveBaseSpuInfo(SpuInfoEntity infoEntity) {

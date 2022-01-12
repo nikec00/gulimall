@@ -7,6 +7,7 @@ import com.atguigu.gulimall.order.constant.OrderConstant;
 import com.atguigu.gulimall.order.entity.OrderItemEntity;
 import com.atguigu.gulimall.order.feign.CartFeignService;
 import com.atguigu.gulimall.order.feign.MemberFeignService;
+import com.atguigu.gulimall.order.feign.ProductFeignService;
 import com.atguigu.gulimall.order.feign.WmsFeignService;
 import com.atguigu.gulimall.order.interceptor.LoginInterceptor;
 import com.atguigu.gulimall.order.vo.*;
@@ -36,6 +37,7 @@ import com.atguigu.common.utils.Query;
 import com.atguigu.gulimall.order.dao.OrderDao;
 import com.atguigu.gulimall.order.entity.OrderEntity;
 import com.atguigu.gulimall.order.service.OrderService;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
@@ -59,6 +61,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Autowired
+    private ProductFeignService productFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -155,7 +160,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         String orderSn = IdWorker.getTimeId();
         OrderEntity orderEntity = buildOrder(orderSn);
         // 2.获取到所有订单项信息
-        List<OrderItemEntity> itemEntities = buildOrderItems();
+        List<OrderItemEntity> itemEntities = buildOrderItems(orderSn);
         // 3.验价
         return to;
     }
@@ -186,12 +191,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      * @param
      * @return
      */
-    private List<OrderItemEntity> buildOrderItems() {
+    private List<OrderItemEntity> buildOrderItems(String orderSn) {
+        // 最后确定每个购物项的价格
         List<OrderItemVo> currentUserCartItems = cartFeignService.getCurrentUserCartItems();
         if (currentUserCartItems != null && currentUserCartItems.size() > 0) {
             List<OrderItemEntity> itemEntities = currentUserCartItems.stream().map(cartItem -> {
-                OrderItemEntity orderItemEntity = buildOrderItem(cartItem);
-                return orderItemEntity;
+                OrderItemEntity itemEntity = buildOrderItem(cartItem);
+                itemEntity.setOrderSn(orderSn);
+                return itemEntity;
             }).collect(Collectors.toList());
             return itemEntities;
         }
@@ -205,7 +212,29 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
      * @return
      */
     private OrderItemEntity buildOrderItem(OrderItemVo cartItem) {
-        return null;
+        OrderItemEntity itemEntity = new OrderItemEntity();
+        //1.订单信息：订单号
+        //2.商品spu信息
+        Long skuId = cartItem.getSkuId();
+        R info = productFeignService.getSpuInfoBySkuId(skuId);
+        SpuInfoVo infoVo = info.getData(new TypeReference<SpuInfoVo>() {});
+        itemEntity.setSpuId(infoVo.getId());
+        itemEntity.setSpuBrand(infoVo.getId().toString());
+        itemEntity.setSpuName(infoVo.getSpuName());
+        itemEntity.setCategoryId(infoVo.getCatalogId());
+        //3.商品sku信息
+        itemEntity.setSkuId(cartItem.getSkuId());
+        itemEntity.setSkuName(cartItem.getTitle());
+        itemEntity.setSkuPic(cartItem.getImage());
+        itemEntity.setSkuPrice(cartItem.getPrice());
+        String skuAttr = StringUtils.collectionToDelimitedString(cartItem.getSkuAttr(), ";");
+        itemEntity.setSkuAttrsVals(skuAttr);
+        itemEntity.setSkuQuantity(cartItem.getCount());
+        //4.优惠信息[不做]
+        //5.积分信息
+        itemEntity.setGiftGrowth(cartItem.getPrice().intValue());
+        itemEntity.setGiftIntegration(cartItem.getPrice().intValue());
+        return itemEntity;
     }
 
 }
