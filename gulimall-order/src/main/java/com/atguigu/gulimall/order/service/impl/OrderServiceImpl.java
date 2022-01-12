@@ -150,7 +150,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         } else {
             //令牌验证成功
             //下单：去创建订单，验令牌，验价格，锁库存
+            //1.创建订单，订单项等信息
             OrderCreateTo order = createOrder();
+            //2.验价
+            BigDecimal payAmount = order.getOrder().getPayAmount();
+            BigDecimal payPrice = orderSubmitVo.getPayPrice();
+            if (Math.abs(payAmount.subtract(payPrice).doubleValue()) < 0.01) {
+                //金额对比成功
+            } else {
+                responseVo.setCode(2);
+                return responseVo;
+            }
         }
         return null;
     }
@@ -194,6 +204,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         //设置积分等信息
         orderEntity.setIntegration(gift.intValue());
         orderEntity.setGrowth(growth.intValue());
+        orderEntity.setDeleteStatus(0); // 未删除
     }
 
     private OrderEntity buildOrder(String orderSn) {
