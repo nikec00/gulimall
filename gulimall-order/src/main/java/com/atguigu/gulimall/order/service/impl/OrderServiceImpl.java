@@ -157,12 +157,23 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             BigDecimal payPrice = orderSubmitVo.getPayPrice();
             if (Math.abs(payAmount.subtract(payPrice).doubleValue()) < 0.01) {
                 //金额对比成功
+                // 3.保存订单
+                saveOrder(order);
             } else {
                 responseVo.setCode(2);
                 return responseVo;
             }
         }
         return null;
+    }
+
+    /**
+     * 保存订单数据
+     * @param order
+     */
+    private void saveOrder(OrderCreateTo order) {
+        OrderEntity orderEntity = order.getOrder();
+
     }
 
     private OrderCreateTo createOrder() {
