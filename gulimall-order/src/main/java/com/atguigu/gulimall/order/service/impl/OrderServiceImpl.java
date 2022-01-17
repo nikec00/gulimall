@@ -148,6 +148,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         SubmitOrderResponseVo responseVo = new SubmitOrderResponseVo();
         MemberRespVo memberRespVo = LoginInterceptor.threadLocal.get();
         orderSubmitVoThreadLocal.set(orderSubmitVo);
+        responseVo.setCode(0);
         // 1.验证令牌【令牌对比和删除必须保证原子性】
         // 0令牌失败 1删除成功
         String orderToken = orderSubmitVo.getOrderToken();
@@ -184,15 +185,18 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 R r = wmsFeignService.orderLockStock(wareSkuLockVo);
                 if (r.getCode() == 0) {
                     //锁成功了
+                    responseVo.setOrder(order.getOrder());
+                    return responseVo;
                 } else {
                     //锁失败了
+                    responseVo.setCode(3);
+                    return responseVo;
                 }
             } else {
                 responseVo.setCode(2);
                 return responseVo;
             }
         }
-        return null;
     }
 
     /**
