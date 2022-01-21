@@ -1,5 +1,6 @@
 package com.atguigu.gulimall.ware.vo;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,8 @@ import java.util.List;
  * @Author: nkc
  * @Date: 2022/1/17 20:00
  */
-public class WareSkuLockVo {
+public class WareSkuLockVo implements Serializable {
+    private static final long serialVersionUID = 4731415081273726726L;
     private String orderSn;
 
     private List<OrderItemVo> locks;

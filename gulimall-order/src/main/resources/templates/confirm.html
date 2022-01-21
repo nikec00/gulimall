@@ -970,7 +970,9 @@
 				});
 
 				highlightAddress();
-				var addrId = $(".addr-item p[def='1']").attr("addrId");
+				debugger
+				var addrId = [[${orderConfirm.address[0].id}]]
+				// var addrId = $(".addr-item p[def='1']").attr("addrId");
 				getFare(addrId)
 			});
 
@@ -986,7 +988,8 @@
 				highlightAddress();
 
 				//获取到当前地址id
-				var addrId = $(this).attr("addrId");
+				var addrId = [[${orderConfirm.address[0].id}]]
+				// var addrId = $(this).attr("addrId");
 
 				//发送ajax请求获取运费信息
 				getFare(addrId);
@@ -996,6 +999,7 @@
 			function getFare(addrId) {
 				//给表单回填选择的地址
 				$("#addrInput").val(addrId);
+				debugger
 				$.get("http://gulimall.com/api/ware/wareinfo/fare?addrId=" + addrId, function (resp) {
 
 					console.log(resp);

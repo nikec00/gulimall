@@ -84,9 +84,75 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         return new PageUtils(page);
     }
-
     @Override
-    public OrderConfirmVo confirmOrder() {
+    public OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException {
+
+        //构建OrderConfirmVo
+        OrderConfirmVo confirmVo = new OrderConfirmVo();
+
+        //获取当前用户登录的信息
+        MemberRespVo memberResponseVo = LoginInterceptor.threadLocal.get();
+
+        //TODO :获取当前线程请求头信息(解决Feign异步调用丢失请求头问题)
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+
+        //开启第一个异步任务
+        CompletableFuture<Void> addressFuture = CompletableFuture.runAsync(() -> {
+
+            //每一个线程都来共享之前的请求数据
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+
+            //1、远程查询所有的收获地址列表
+            List<MemberAddressVo> address = memberFeignService.getAddress(memberResponseVo.getId());
+            confirmVo.setAddress(address);
+        }, executor);
+
+        //开启第二个异步任务
+        CompletableFuture<Void> cartInfoFuture = CompletableFuture.runAsync(() -> {
+
+            //每一个线程都来共享之前的请求数据
+            RequestContextHolder.setRequestAttributes(requestAttributes);
+
+            //2、远程查询购物车所有选中的购物项
+            List<OrderItemVo> currentCartItems = cartFeignService.getCurrentUserCartItems();
+            confirmVo.setItems(currentCartItems);
+            //feign在远程调用之前要构造请求，调用很多的拦截器
+        }, executor).thenRunAsync(() -> {
+            List<OrderItemVo> items = confirmVo.getItems();
+            //获取全部商品的id
+            List<Long> skuIds = items.stream()
+                    .map((itemVo -> itemVo.getSkuId()))
+                    .collect(Collectors.toList());
+
+            //远程查询商品库存信息
+            List<SkuStockVo> skuStockVos = wmsFeignService.getSkusHasStock(skuIds);
+            if (skuStockVos != null && skuStockVos.size() > 0) {
+                //将skuStockVos集合转换为map
+                Map<Long, Boolean> skuHasStockMap = skuStockVos.stream().collect(Collectors.toMap(SkuStockVo::getSkuId, SkuStockVo::getHasStock));
+                confirmVo.setStocks(skuHasStockMap);
+            }
+        }, executor);
+
+        //3、查询用户积分
+        Integer integration = memberResponseVo.getIntegration();
+        confirmVo.setIntegration(integration);
+
+        //4、价格数据自动计算
+
+        //TODO 5、防重令牌(防止表单重复提交)
+        //为用户设置一个token，三十分钟过期时间（存在redis）
+        String token = UUID.randomUUID().toString().replace("-", "");
+        redisTemplate.opsForValue().set(OrderConstant.USER_ORDER_TOKEN_PREFIX + memberResponseVo.getId(), token, 30, TimeUnit.MINUTES);
+        confirmVo.setOrderToken(token);
+
+
+        CompletableFuture.allOf(addressFuture, cartInfoFuture).get();
+
+        return confirmVo;
+    }
+
+
+    public OrderConfirmVo confirmOrder1() {
         OrderConfirmVo confirmVo = new OrderConfirmVo();
         MemberRespVo memberRespVo = LoginInterceptor.threadLocal.get();
         System.out.println("主线程..." + Thread.currentThread().getId());
@@ -174,14 +240,14 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 // 订单号，所有订单项（skuId，skuName，num）
                 WareSkuLockVo wareSkuLockVo = new WareSkuLockVo();
                 wareSkuLockVo.setOrderSn(order.getOrder().getOrderSn());
-                List<OrderItemVo> locks = order.getOrderItems().stream().map(item -> {
-                    OrderItemVo itemVo = new OrderItemVo();
-                    itemVo.setSkuId(item.getSkuId());
-                    itemVo.setCount(item.getSkuQuantity());
-                    itemVo.setTitle(item.getSkuName());
-                    return itemVo;
+                List<OrderItemVo> orderItemVos = order.getOrderItems().stream().map(item -> {
+                    OrderItemVo orderItemVo = new OrderItemVo();
+                    orderItemVo.setSkuId(item.getSkuId());
+                    orderItemVo.setCount(item.getSkuQuantity());
+                    orderItemVo.setTitle(item.getSkuName());
+                    return orderItemVo;
                 }).collect(Collectors.toList());
-                wareSkuLockVo.setLocks(locks);
+                wareSkuLockVo.setLocks(orderItemVos);
                 R r = wmsFeignService.orderLockStock(wareSkuLockVo);
                 if (r.getCode() == 0) {
                     //锁成功了
@@ -224,6 +290,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         List<OrderItemEntity> itemEntities = buildOrderItems(orderSn);
         // 3.计算价格相关数据
         computePrice(orderEntity, itemEntities);
+        to.setOrder(orderEntity);
+        to.setOrderItems(itemEntities);
         return to;
     }
 

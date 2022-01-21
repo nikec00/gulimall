@@ -14,12 +14,14 @@ public class OrderItemVo implements Serializable {
 
     private Long skuId;
 
-    private Boolean check = true;
+    private Boolean check;
 
     private String title;
 
     private String image;
-
+    /**
+     * 商品套餐属性
+     */
     private List<String> skuAttr;
 
     private BigDecimal price;
@@ -28,15 +30,13 @@ public class OrderItemVo implements Serializable {
 
     private BigDecimal totalPrice;
 
-    private BigDecimal weight;
+    /**
+     * 减免价格
+     */
+    private BigDecimal reduce = new BigDecimal("0.00");
 
-    public BigDecimal getWeight() {
-        return weight;
-    }
-
-    public void setWeight(BigDecimal weight) {
-        this.weight = weight;
-    }
+    /** 商品重量 **/
+    private BigDecimal weight = new BigDecimal("0.085");
 
     public Long getSkuId() {
         return skuId;
@@ -95,10 +95,26 @@ public class OrderItemVo implements Serializable {
     }
 
     public BigDecimal getTotalPrice() {
-        return this.price.multiply(new BigDecimal("" + this.count));
+        return totalPrice;
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public BigDecimal getReduce() {
+        return reduce;
+    }
+
+    public void setReduce(BigDecimal reduce) {
+        this.reduce = reduce;
+    }
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
     }
 }

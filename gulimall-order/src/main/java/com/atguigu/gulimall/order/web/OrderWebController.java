@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * @Description£º
  * @Author: nkc
@@ -24,7 +26,7 @@ public class OrderWebController {
     private OrderService orderService;
 
     @GetMapping("/toTrade")
-    public String toTrade(Model model) {
+    public String toTrade(Model model) throws ExecutionException, InterruptedException {
         OrderConfirmVo confirmVo = orderService.confirmOrder();
         model.addAttribute("orderConfirm", confirmVo);
         return "confirm";
