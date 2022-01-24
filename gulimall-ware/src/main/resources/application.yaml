@@ -1,6 +1,17 @@
 server:
   port: 11000
 spring:
+  rabbitmq:
+    virtual-host: /
+    host: 121.40.210.58
+    port: 5672
+    publisher-confirms: true
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        acknowledge-mode: manual
   application:
     name: gulimall-ware
   datasource:
