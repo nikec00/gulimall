@@ -250,6 +250,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                     return orderItemVo;
                 }).collect(Collectors.toList());
                 wareSkuLockVo.setLocks(orderItemVos);
+                //为了保证高并发，库存服务自己回滚。可以发送消息给库存服务；
+                //库存服务本身也可以使用自动解锁模式
                 R r = wmsFeignService.orderLockStock(wareSkuLockVo);
                 if (r.getCode() == 0) {
                     //锁成功了
