@@ -2,6 +2,7 @@ package com.atguigu.gulimall.order.interceptor;
 
 import com.atguigu.common.vo.MemberRespVo;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,13 +21,18 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        String requestURI = request.getRequestURI();
+        boolean match = new AntPathMatcher().match("/order/order/status/**", requestURI);
+        if (match) {
+            return true;
+        }
         HttpSession session = request.getSession();
         MemberRespVo loginUser = (MemberRespVo) session.getAttribute("loginUser");
         if (loginUser != null) {
             threadLocal.set(loginUser);
             return true;
-        }else {
-            request.getSession().setAttribute("msg","请先进行登录！");
+        } else {
+            request.getSession().setAttribute("msg", "请先进行登录！");
             response.sendRedirect("http://auth.gulimall.com/login.html");
             return false;
         }

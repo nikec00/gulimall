@@ -85,6 +85,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
         return new PageUtils(page);
     }
+
     @Override
     public OrderConfirmVo confirmOrder() throws ExecutionException, InterruptedException {
 
@@ -209,7 +210,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return confirmVo;
     }
 
-//    @GlobalTransactional
+    //    @GlobalTransactional
     @Transactional
     @Override
     public SubmitOrderResponseVo submitOrder(OrderSubmitVo orderSubmitVo) {
@@ -267,6 +268,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
                 return responseVo;
             }
         }
+    }
+
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+
+        return this.getOne(new QueryWrapper<OrderEntity>().eq("order_sn", orderSn));
     }
 
     /**
