@@ -1,13 +1,23 @@
 package com.atguigu.gulimall.ware;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest
-class GulimallWareApplicationTests {
+@RunWith(SpringRunner.class)
+public class GulimallWareApplicationTests {
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
+
+        rabbitTemplate.convertAndSend("stock-event-exchange","stock.locked","1");
     }
 
 }
