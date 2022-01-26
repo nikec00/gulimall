@@ -18,17 +18,17 @@ import java.util.Map;
 @Configuration
 public class MyRabbitConfig {
 
-    @RabbitListener(queues = "stock.release.stock.queue")
-    public void listener(Message message) {
-        System.out.println("-----------------------------");
-        System.out.println(message);
-    }
-
-    @RabbitListener(queues = "stock.delay.queue")
-    public void listener2(Message message) {
-        System.out.println("-----------------------------");
-        System.out.println(message);
-    }
+//    @RabbitListener(queues = "stock.release.stock.queue")
+//    public void listener(Message message) {
+//        System.out.println("-----------------------------");
+//        System.out.println(message);
+//    }
+//
+//    @RabbitListener(queues = "stock.delay.queue")
+//    public void listener2(Message message) {
+//        System.out.println("-----------------------------");
+//        System.out.println(message);
+//    }
 
     /**
      * 使用json序列化机制，进行消息转换

@@ -15,6 +15,9 @@ import com.atguigu.gulimall.ware.vo.SkuHasStockVo;
 import com.atguigu.gulimall.ware.vo.WareSkuLockVo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitHandler;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +40,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 
+@RabbitListener(queues = "stock.release.stock.queue")
 @Service("wareSkuService")
 public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> implements WareSkuService {
 
@@ -54,6 +58,31 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
 
     @Autowired
     private WareOrderTaskDetailService wareOrderTaskDetailService;
+
+    /**
+     * 库存自动解锁
+     *
+     * @param to
+     * @param message
+     */
+    @RabbitHandler
+    public void handleStockLockedRelease(StockLockedTo to, Message message) {
+        System.out.println("收到解锁库存的消息");
+        Long id = to.getId();
+        StockDetailTo detailTo = to.getDetailTo();
+        Long skuId = detailTo.getSkuId();
+        Long detailId = detailTo.getId();
+        //解锁
+        //1.查询数据库关于这个订单的锁定库存信息
+        //有
+        //没有：库存锁定失败，库存回滚了。这种情况无需解锁
+        WareOrderTaskDetailEntity byId = wareOrderTaskDetailService.getById(detailId);
+        if (byId != null) {
+            //解锁
+        } else {
+            //无需解锁
+        }
+    }
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -161,7 +190,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                     StockDetailTo stockDetailTo = new StockDetailTo();
                     BeanUtils.copyProperties(detailEntity, stockDetailTo);
                     lockedTo.setDetailTo(stockDetailTo);
-                    rabbitTemplate.convertAndSend("order.event.exchange", "stock.locked", lockedTo);
+                    rabbitTemplate.convertAndSend("stock-event-exchange", "stock.locked", lockedTo);
                     break;
                 } else {
                     //当前仓库锁失败，重试下一个仓库
