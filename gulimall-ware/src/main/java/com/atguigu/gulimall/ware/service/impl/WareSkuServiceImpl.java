@@ -3,6 +3,7 @@ package com.atguigu.gulimall.ware.service.impl;
 import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.mq.StockDetailTo;
 import com.atguigu.common.mq.StockLockedTo;
+import com.atguigu.common.to.mq.OrderTo;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskDetailEntity;
 import com.atguigu.gulimall.ware.entity.WareOrderTaskEntity;
@@ -224,6 +225,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 //消息拒绝后重新放入队列，让别人继续消费解锁
                 throw new RuntimeException("远程服务失败");
             }
+        }
+    }
+
+    //防止订单服务卡顿，导致订单状态信息一直改变不了，
+    @Transactional
+    @Override
+    public void unlockStock(OrderTo to) {
+        String orderSn = to.getOrderSn();
+        //查一下最新库存的状态，防止重复解锁库存
+        WareOrderTaskEntity orderTaskEntity = wareOrderTaskService.getOrderTaskByOrderSn(orderSn);
+        Long id = orderTaskEntity.getId();
+        List<WareOrderTaskDetailEntity> entities = wareOrderTaskDetailService.list(new QueryWrapper<WareOrderTaskDetailEntity>().eq("task_id", id).eq("lock_status", 1));
+        for (WareOrderTaskDetailEntity entity : entities) {
+            unLockStock(entity.getSkuId(), entity.getWareId(), entity.getSkuNum(), entity.getId());
         }
     }
 

@@ -30,6 +30,8 @@ spring:
         server-addr: 121.40.210.58:8848
   thymeleaf:
     cache: false
+    servlet:
+      content-type: text/html
 mybatis-plus:
   type-aliases-package: com.atguigu.gulimall.order.entity
   mapper-locations: classpath:/mapper/order/*Dao.xml
@@ -45,3 +47,10 @@ feign:
       gulimall-cart:
         connectTimeout: 10000
         readTimeout: 10000
+alipay:
+  app_id: 2021000119606313
+  notify_url: http://xb6cg22x28.52http.net/order/pay/alipay/success
+  return_url: http://localhost:2000/pay/success.html
+  sign_type: RSA2
+  charset: utf-8
+  gatewayUrl: https://openapi.alipaydev.com/gateway.do
