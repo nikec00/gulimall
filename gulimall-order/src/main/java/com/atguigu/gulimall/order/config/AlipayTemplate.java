@@ -22,7 +22,7 @@ public class AlipayTemplate {
     // 支付宝公钥,查看地址：https://openhome.alipay.com/platform/keyManage.htm 对应APPID下的支付宝公钥。
     private String alipay_public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn9m0klLiujQecHfbNpdKQpqo2ZW1KD1VE5YAYTPpszlRxe0+m5URP1/Q0TRcw8vOuwFP+p1UHryUv5xcqS2JbyM8g7SIx4KRSrrtKazMWLEiK4xu8s6c+pD+FrU9Ez+zWxniT+fJumn6vxzQNE5xQvr5Lc+6WFbX1ymcsYN4ZXN0pqp0f/z8D+yl1kpyX+bPcvcgFRRlHFjERkLRLn8dBDRlmUkhoBGM2tQZsJBuk/IaH02OkiZB4pwhr8ggGsEUtvhRIZXxOBlxou3e24Sic2UOpNfWv5gG631N6xJTbmjDBTlXf1qFagi9o6VhGTc1c9S0yKTwGVCb5Wtj33E1RwIDAQAB";
     // 服务器[异步通知]页面路径  需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问
-    // 支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息
+    // 支付宝会悄悄的给我们发送一个请求，告诉我们支付成功的信息（异步回调）
     private String notify_url;
 
     // 页面跳转同步通知页面路径 需http://格式的完整路径，不能加?id=123这类自定义参数，必须外网可以正常访问

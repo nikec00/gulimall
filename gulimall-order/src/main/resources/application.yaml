@@ -49,7 +49,7 @@ feign:
         readTimeout: 10000
 alipay:
   app_id: 2021000119606313
-  notify_url: http://xb6cg22x28.52http.net/order/pay/alipay/success
+  notify_url: http://m7skjh.natappfree.cc/payed/notify
   return_url: http://member.gulimall.com/memberOrder.html
   sign_type: RSA2
   charset: utf-8
